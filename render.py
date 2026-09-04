@@ -150,8 +150,7 @@ class Renderer:
         for i in range(0, len(track.center_pts), 40):
             x, y = self.cam.to_screen(*track.center_pts[i])
             pygame.draw.circle(sc, (30, 33, 42), (int(x), int(y)), 1)
-        sx, sy = self.cam.to_screen(*track.start_xy)
-        pygame.draw.circle(sc, (250, 220, 140), (int(sx), int(sy)), 5)
+        self.start_finish_line(track)
 
         for c in cars:
             if c.alive and c is not best:
@@ -170,6 +169,24 @@ class Renderer:
         wx = c.x + lx * ca - ly * sa
         wy = c.y + lx * sa + ly * ca
         return self.cam.to_screen(wx, wy)
+
+    def start_finish_line(self, track):
+        """A checkered stripe across the full track width at theta=-pi. It is
+        both the start and the finish line - the track is a loop, so crossing
+        it again after a full circuit is what completes a lap."""
+        inner = track.inner_pts[0]
+        outer = track.outer_pts[0]
+        n = 8
+        for i in range(n):
+            t0, t1 = i / n, (i + 1) / n
+            p0 = inner + (outer - inner) * t0
+            p1 = inner + (outer - inner) * t1
+            col = (235, 235, 235) if i % 2 == 0 else (25, 25, 30)
+            a = self.cam.to_screen(*p0)
+            b = self.cam.to_screen(*p1)
+            pygame.draw.line(self.screen, col, a, b, max(2, int(6 * self.cam.zoom)))
+        x, y = self.cam.to_screen(*track.start_xy)
+        pygame.draw.circle(self.screen, (250, 220, 140), (int(x), int(y)), 3)
 
     def car(self, c, color, ring=False):
         L, W = self.cfg.car_len, self.cfg.car_w
