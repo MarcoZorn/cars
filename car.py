@@ -26,6 +26,26 @@ def n_inputs(cfg):
     return cfg.n_rays + 1  # rays + own speed
 
 
+def ray_angles(cfg):
+    """Angle offsets for each sensor ray, relative to heading.
+
+    An open cone (fov < a full circle) should hit both of its extreme edges,
+    so the endpoints are included. A full 360-degree ring has no edges - the
+    last ray is the same direction as the first would be - so the endpoint is
+    dropped there instead, or one direction would be sensed twice and another
+    (the true opposite of ray 0) would be missing.
+
+    Shared by the physics and the renderer so what a car senses and what is
+    drawn as its sensor fan can never silently drift apart.
+    """
+    half = cfg.fov / 2
+    if cfg.n_rays <= 1:
+        return [0.0]
+    if abs(cfg.fov - 2 * math.pi) < 1e-9:
+        return [-half + cfg.fov * i / cfg.n_rays for i in range(cfg.n_rays)]
+    return [-half + cfg.fov * i / (cfg.n_rays - 1) for i in range(cfg.n_rays)]
+
+
 class Car:
     """A car's race, not just its current attempt.
 
@@ -79,9 +99,8 @@ def sense_all(cars, track, cfg):
     """
     n = len(cars)
     steps = 20
-    half = cfg.fov / 2
     t = np.linspace(0.0, 1.0, steps)[None, None, :]                 # 1,1,S
-    ray_off = np.linspace(-half, half, cfg.n_rays)[None, :, None]   # 1,R,1
+    ray_off = np.array(ray_angles(cfg))[None, :, None]              # 1,R,1
 
     xs = np.fromiter((c.x for c in cars), float, n)[:, None, None]
     ys = np.fromiter((c.y for c in cars), float, n)[:, None, None]

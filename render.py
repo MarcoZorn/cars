@@ -4,6 +4,7 @@ import math
 
 import pygame
 
+from car import ray_angles
 from tracks import CANVAS_H, CANVAS_W
 
 BG = (12, 14, 19)
@@ -210,10 +211,9 @@ class Renderer:
         """The leader's sensor fan: one line per ray, coloured by how close
         the wall it is reporting actually is."""
         cfg = self.cfg
-        half = cfg.fov / 2
         sx, sy = self.cam.to_screen(c.x, c.y)
-        for i in range(cfg.n_rays):
-            ang = c.a - half + cfg.fov * i / max(1, cfg.n_rays - 1)
+        for i, off in enumerate(ray_angles(cfg)):
+            ang = c.a + off
             prox = c.sensors[i] if i < len(c.sensors) else 0.0
             length = cfg.ray_range * (1.0 - prox) * self.cam.zoom
             near = max(0.0, min(1.0, prox))
@@ -267,7 +267,10 @@ class Renderer:
             v = b.act.get(node, 0.0)
             r = (4 + 4 * min(1.0, abs(v))) * cfg.ui_scale
             pygame.draw.circle(self.screen, self._act_color(v), (int(x), int(y)), int(r))
-        names = [f"ray{i}" for i in range(cfg.n_rays)] + ["speed"]
+        compass = ["front", "front-R", "right", "back-R",
+                  "back", "back-L", "left", "front-L"]
+        names = ([compass[i] if i < len(compass) else f"ray{i}"
+                 for i in range(cfg.n_rays)] + ["speed"])
         for node, name in zip(b.inputs, names):
             x, y = pos[node]
             self.text(name, x - int(56 * cfg.ui_scale), y - 7, DIM, self.fs)

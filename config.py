@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 
 
@@ -31,8 +32,11 @@ class Config:
     add_conn_tries: int = 20
 
     # sensors: rays fanned across the windshield, plus own speed
-    n_rays: int = 7
-    fov: float = 2.5              # radians, total field of view
+    # 8 rays spanning the full circle: front, back, left, right and the four
+    # diagonals, not just a forward cone - a car should feel what is beside
+    # and behind it too, not only what it is about to hit.
+    n_rays: int = 8
+    fov: float = 2 * math.pi      # a full circle of coverage
     ray_range: float = 220.0
 
     # car physics (arcade model, not a real bicycle model)

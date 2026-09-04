@@ -8,7 +8,7 @@ import random
 
 import numpy as np
 
-from car import Car, N_OUTPUTS, fitness, n_inputs, sense_all, step_all
+from car import Car, N_OUTPUTS, fitness, n_inputs, ray_angles, sense_all, step_all
 from config import Config
 from neat_core.brain import Brain
 from neat_core.genes import Genome, Innovations
@@ -21,6 +21,29 @@ def genome(cfg, innov, n=40):
     for _ in range(n):
         g.mutate(innov, cfg)
     return g
+
+
+def test_ray_angles_cover_a_full_circle_without_duplicating_the_seam():
+    """A 360-degree sensor ring has no edges, so the last ray must not repeat
+    the first one - that would sense one direction twice and leave the true
+    opposite of the front ray with no sensor at all."""
+    cfg = Config()
+    angles = ray_angles(cfg)
+    assert len(angles) == cfg.n_rays
+    assert angles[0] == -cfg.fov / 2
+    spacing = 2 * math.pi / cfg.n_rays
+    for i in range(1, len(angles)):
+        assert abs((angles[i] - angles[i - 1]) - spacing) < 1e-9
+    span = angles[-1] - angles[0]
+    assert abs(span - (2 * math.pi - spacing)) < 1e-9, \
+        "the last ray must stop one step short of wrapping onto the first"
+
+
+def test_ray_angles_span_both_edges_of_an_open_cone():
+    cfg = Config(n_rays=5, fov=2.0)
+    angles = ray_angles(cfg)
+    assert abs(angles[0] - (-1.0)) < 1e-9
+    assert abs(angles[-1] - 1.0) < 1e-9
 
 
 def test_tracks_are_simple_closed_curves():
@@ -86,11 +109,11 @@ def test_sense_all_matches_per_car_geometry():
         c.a += random.uniform(-1, 1)
 
     batched = sense_all(cars, track, cfg)
+    angles = ray_angles(cfg)
 
     for c, row in zip(cars, batched):
-        half = cfg.fov / 2
         for i in range(cfg.n_rays):
-            ang = c.a - half + cfg.fov * i / max(1, cfg.n_rays - 1)
+            ang = c.a + angles[i]
             steps = 20
             hit = cfg.ray_range
             for k in range(1, steps):
