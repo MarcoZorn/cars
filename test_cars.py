@@ -81,8 +81,40 @@ def test_tracks_do_not_pinch_shut():
                 & (np.abs(np.arange(n) - i - n) > n * 0.05)
                 & (np.abs(np.arange(n) - i + n) > n * 0.05)).any()
         )
-        assert min_gap > float(t.half_width(np.array([0.0]))[0]) * 0.5, \
+        narrowest = float(t.half_width(t.theta_samples).min())
+        assert min_gap > narrowest * 0.5, \
             f"{t.name}: inner boundary comes close to crossing itself"
+
+
+def test_difficulty_actually_makes_later_tracks_harder():
+    """The curriculum only means anything if the geometry really changes -
+    otherwise track 15 is just track 1 with a different name."""
+    cfg = Config()
+    tracks = build_tracks(cfg)
+    easiest, hardest = tracks[0], tracks[-1]
+
+    def wobble(t):
+        theta = t.theta_samples
+        r = t.r_unit(theta)
+        return float(np.std(r) / t.base_r)
+
+    def width_variation(t):
+        return float(t.width_mult(t.theta_samples).std())
+
+    assert wobble(hardest) > wobble(easiest), \
+        "the hardest track's centerline should wobble more than the easiest"
+    assert width_variation(hardest) >= width_variation(easiest), \
+        "the hardest track should vary in width at least as much as the easiest"
+
+
+def test_every_track_stays_wide_enough_for_the_car():
+    """Even at its narrowest point, a track must leave real room either side
+    of the car - not just barely wider than it."""
+    cfg = Config()
+    for t in build_tracks(cfg):
+        narrowest = float(t.half_width(t.theta_samples).min())
+        assert narrowest > cfg.car_w * 3, \
+            f"{t.name}: a pinch point is too tight for the car to fit through"
 
 
 def test_progress_accumulates_across_laps():

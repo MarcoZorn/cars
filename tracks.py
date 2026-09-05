@@ -8,7 +8,13 @@ positive (sx, sy) scale is an affine map and preserves that property, which is
 what turns a plain wobbly circle into ovals, figure-eight-ish sweeps and tight
 chicanes without ever risking a self-intersecting track.
 
-Because every boundary and every physics check is derived from the same two
+Track width is also a function of theta rather than a constant, so a lap can
+include narrow chicanes as well as wide sweepers. Difficulty rises with a
+track's position in the roster: track 1 is a gentle, nearly-constant-width
+oval, track 15 has sharper harmonics on the centerline and real pinch-and-flare
+width variation - a rough curriculum, not just fifteen copies of the same idea.
+
+Because every boundary and every physics check is derived from the same
 analytic functions - r(theta) and half_width(theta) - a car's position can be
 tested against the track in O(1) by inverting the affine map and looking the
 angle up, rather than testing against a polygon with hundreds of edges. That
@@ -23,24 +29,43 @@ CANVAS_W = 1400
 CANVAS_H = 1000
 SAMPLES = 1440  # centerline resolution, used for rendering and arc length
 
+# how far the width is allowed to swing around its base fraction - clipped so
+# a "narrow" stretch is tight but never impassably so
+WIDTH_SWING_MIN = 0.55
+WIDTH_SWING_MAX = 1.45
+
 
 class Track:
-    def __init__(self, seed, name=None):
+    def __init__(self, seed, name=None, difficulty=0.0):
         rng = random.Random(seed)
         self.seed = seed
         self.name = name or f"Track {seed}"
+        self.difficulty = difficulty
         self.cx, self.cy = CANVAS_W / 2, CANVAS_H / 2
 
         self.base_r = rng.uniform(210, 320)
-        n_harm = rng.randint(2, 4)
+        # harder tracks get more harmonics and sharper amplitude on the
+        # centerline - more chicanes, tighter esses
+        n_harm = rng.randint(2, 4) + round(difficulty * 3)
+        amp_scale = 1.0 + difficulty * 0.7
         self.harmonics = [
-            (rng.randint(2, 6), rng.uniform(0.05, 0.22) / n_harm, rng.uniform(0, 2 * math.pi))
+            (rng.randint(2, 7), rng.uniform(0.05, 0.20) * amp_scale / n_harm,
+             rng.uniform(0, 2 * math.pi))
             for _ in range(n_harm)
         ]
         # anisotropic stretch: ovals and elongated loops, never a self-cross
         self.sx = rng.uniform(0.75, 1.35)
         self.sy = rng.uniform(0.75, 1.35)
-        self.width_frac = rng.uniform(0.10, 0.15)
+        self.width_frac = rng.uniform(0.12, 0.16)
+
+        # width variation: flat (constant width) on easy tracks, real
+        # narrow-then-wide chicanes on hard ones
+        n_wharm = rng.randint(0, 1) + round(difficulty * 2)
+        wamp = difficulty * rng.uniform(0.18, 0.32)
+        self.width_harmonics = [
+            (rng.randint(2, 5), wamp / max(1, n_wharm), rng.uniform(0, 2 * math.pi))
+            for _ in range(n_wharm)
+        ]
 
         self._build()
 
@@ -53,8 +78,16 @@ class Track:
             r = r + self.base_r * amp * np.sin(k * theta + phase)
         return np.maximum(r, self.base_r * 0.35)
 
+    def width_mult(self, theta):
+        """How wide the track is here, as a multiple of its base width."""
+        theta = np.asarray(theta, dtype=float)
+        m = np.ones_like(theta)
+        for k, amp, phase in self.width_harmonics:
+            m = m + amp * np.sin(k * theta + phase)
+        return np.clip(m, WIDTH_SWING_MIN, WIDTH_SWING_MAX)
+
     def half_width(self, theta):
-        return self.r_unit(theta) * self.width_frac
+        return self.r_unit(theta) * self.width_frac * self.width_mult(theta)
 
     def to_world(self, theta, r):
         theta = np.asarray(theta, dtype=float)
@@ -73,7 +106,7 @@ class Track:
     def on_track(self, x, y):
         theta, r = self.from_world(x, y)
         rc = self.r_unit(theta)
-        hw = rc * self.width_frac
+        hw = self.half_width(theta)
         return (r >= rc - hw) & (r <= rc + hw)
 
     # --- precomputed geometry, arc length, start line ---
@@ -81,7 +114,7 @@ class Track:
     def _build(self):
         theta = np.linspace(-math.pi, math.pi, SAMPLES, endpoint=False)
         r = self.r_unit(theta)
-        hw = r * self.width_frac
+        hw = self.half_width(theta)
         self.theta_samples = theta
         cx, cy = self.to_world(theta, r)
         self.center_pts = np.column_stack([cx, cy])
@@ -110,4 +143,7 @@ class Track:
 
 
 def build_tracks(cfg):
-    return [Track(cfg.track_seed + i, name=f"Track {i + 1}") for i in range(cfg.n_tracks)]
+    n = cfg.n_tracks
+    return [Track(cfg.track_seed + i, name=f"Track {i + 1}",
+                  difficulty=i / max(1, n - 1))
+            for i in range(n)]
