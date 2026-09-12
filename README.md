@@ -3,6 +3,14 @@
 Self-driving cars evolved with NEAT. No hand-written driving logic - just
 wall-detecting sensors, a neural net, and a genetic algorithm.
 
+![600 cars driving an evolved neural network around a procedural track, with the leader's network drawn live](docs/demo.gif)
+
+<sub>Generation 16 of a live run. The panel on the right is the leader's actual network:
+its inputs are eight wall distances and its own speed, its outputs are steering and
+throttle, and the hidden nodes between them were added by mutation, not by design.
+A browser version you can run without installing anything is at
+[neat-from-scratch](https://github.com/MarcoZorn/neat-from-scratch).</sub>
+
 ## What it does
 
 - 1000 cars, 15 procedurally generated tracks, 250 generations
