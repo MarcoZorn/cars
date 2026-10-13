@@ -109,7 +109,9 @@ of 32 seeds:
 | total fitness (no sharing) | 14.1 | 12.5 | 279 |
 
 Half a lap more on unseen tracks in both batches, at laps about 5% slower.
-No sharing at all matches it on laps and is slower still. The comparisons
+No sharing at all matches it on laps and is slower still. With the fix in, the
+weight step still holds up (hard set, 32 seeds, held-out laps): 11.5 at
+0.35, 12.5 at 0.6, 12.6 at 0.9. It stays at 0.6. The comparisons
 above this one, other than the first table, were measured with the bug in
 place.
 
