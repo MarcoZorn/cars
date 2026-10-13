@@ -83,11 +83,14 @@ against the full ring of eight, 32 seeds on the hard set:
 |---|---|---|---|
 | ring of 8 | 13.5 | 12.1 | 248 |
 | front 5 | 13.8 | 12.1 | 274 |
+| front 5 + back diagonals | 13.8 | 11.9 | 281 |
 
-Exactly as many laps either way, but a driver that can see behind it laps
-about a tenth faster. My guess is the back diagonals: coming out of a corner
-they still see the wall the car is pulling away from, so it can put the
-power down earlier. The ring stays.
+Exactly as many laps either way, but a driver with the whole ring laps about
+a tenth faster. My guess was the back diagonals: coming out of a corner they
+still see the wall the car is pulling away from. Wrong: with them and
+without the ray pointing straight back (`n_rays=7 fov=1.5pi`) it is as slow
+as the front five alone. Whatever the full ring gives, it takes the ray
+that looks straight back, or the whole set. The ring stays.
 
 ## Files
 
