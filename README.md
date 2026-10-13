@@ -29,6 +29,7 @@ Tracks cycle each generation so the population doesn't just memorize one loop.
 ```
 pip install -r requirements.txt
 python run.py
+python run.py --hard   # sharper, narrower tracks, pillars on the hardest
 ```
 
 Controls:
