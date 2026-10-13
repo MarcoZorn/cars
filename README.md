@@ -57,12 +57,14 @@ training, same difficulty curve, different seeds. On the standard set the
 task saturates (by generation 40 nearly every run laps every training
 track), and the held-out score is what still separates runs. The hard set
 (sharper, narrower tracks, pillars on the hardest) does not saturate.
-16 seeds, population 200, 40 generations:
+16 seeds, population 200, 40 generations, with the defaults as they are now
+(weight step 0.6 and fitness sharing fixed, both below), and in brackets as
+they were before either:
 
 | | training laps / 15 | held-out laps / 15 | gap |
 |---|---|---|---|
-| standard tracks | 14.4 | 13.1 | 1.3 |
-| hard tracks | 12.9 | 10.8 | 2.1 |
+| standard tracks | 14.9 (14.4) | 13.7 (13.1) | 1.2 (1.3) |
+| hard tracks | 14.1 (12.9) | 12.9 (10.8) | 1.2 (2.1) |
 
 Bigger weight mutations generalise better. With the weight step raised from
 0.35 to 0.6 (now the default), over 32 seeds on the hard set the held-out
@@ -107,8 +109,9 @@ of 32 seeds:
 | total fitness (no sharing) | 14.1 | 12.5 | 279 |
 
 Half a lap more on unseen tracks in both batches, at laps about 5% slower.
-No sharing at all matches it on laps and is slower still. The tables above
-this one were measured with the bug in place.
+No sharing at all matches it on laps and is slower still. The comparisons
+above this one, other than the first table, were measured with the bug in
+place.
 
 ## Files
 
