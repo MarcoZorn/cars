@@ -155,18 +155,22 @@ def step_all(cars, track, cfg):
     theta, _ = track.from_world(x, y)
     on = track.on_track(x, y)
 
+    # unwrap each car's angle around the track and turn it into distance
+    last = np.fromiter((c.last_theta for c in alive), float, n)
+    unwrapped = np.fromiter((c.theta_unwrapped for c in alive), float, n)
+    theta0 = np.fromiter((c.theta0 for c in alive), float, n)
+    delta = theta - last
+    delta = np.where(delta > math.pi, delta - 2 * math.pi,
+                     np.where(delta < -math.pi, delta + 2 * math.pi, delta))
+    unwrapped = unwrapped + delta
+    progress = track.progress(theta0 + unwrapped) - track.progress(theta0)
+
     for i, c in enumerate(alive):
         c.v, c.a, c.x, c.y = float(v[i]), float(a[i]), float(x[i]), float(y[i])
         c.ticks += 1
-        delta = float(theta[i]) - c.last_theta
-        if delta > math.pi:
-            delta -= 2 * math.pi
-        elif delta < -math.pi:
-            delta += 2 * math.pi
-        c.theta_unwrapped += delta
+        c.theta_unwrapped = float(unwrapped[i])
         c.last_theta = float(theta[i])
-        c.progress = float(track.progress(c.theta0 + c.theta_unwrapped)
-                           - track.progress(c.theta0))
+        c.progress = float(progress[i])
         c.best_progress = max(c.best_progress, c.progress)
 
         if c.progress >= track.lap_length:
