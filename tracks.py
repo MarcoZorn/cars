@@ -28,6 +28,7 @@ import numpy as np
 CANVAS_W = 1400
 CANVAS_H = 1000
 SAMPLES = 1440  # centerline resolution, used for rendering and arc length
+LUT_SAMPLES = 8192  # wall lookup table resolution, used for collision tests
 
 # how far the width is allowed to swing around its base fraction - clipped so
 # a "narrow" stretch is tight but never impassably so
@@ -105,13 +106,25 @@ class Track:
 
     def on_track(self, x, y):
         theta, r = self.from_world(x, y)
-        rc = self.r_unit(theta)
-        hw = self.half_width(theta)
-        return (r >= rc - hw) & (r <= rc + hw)
+        # the walls, read from a fine lookup table rather than re-summing
+        # every harmonic for every one of the few thousand points a tick
+        # tests - well under a pixel off the analytic walls
+        f = (theta + math.pi) * (LUT_SAMPLES / (2 * math.pi))
+        i = np.minimum(f.astype(np.int64), LUT_SAMPLES - 1)
+        w = f - i
+        lo = self._lut_lo[i] * (1 - w) + self._lut_lo[i + 1] * w
+        hi = self._lut_hi[i] * (1 - w) + self._lut_hi[i + 1] * w
+        return (r >= lo) & (r <= hi)
 
     # --- precomputed geometry, arc length, start line ---
 
     def _build(self):
+        # inner and outer wall radius on a closed grid over [-pi, pi], so
+        # entry i + 1 always exists for linear interpolation
+        lut = np.linspace(-math.pi, math.pi, LUT_SAMPLES + 1)
+        r, hw = self.r_unit(lut), self.half_width(lut)
+        self._lut_lo, self._lut_hi = r - hw, r + hw
+
         theta = np.linspace(-math.pi, math.pi, SAMPLES, endpoint=False)
         r = self.r_unit(theta)
         hw = self.half_width(theta)
