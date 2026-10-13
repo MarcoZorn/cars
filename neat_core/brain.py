@@ -5,13 +5,9 @@ a handful of sensors, a couple of outputs - so a plain python loop is plenty
 fast; there is no need for the vectorised evaluator a much bigger brain would
 want.
 """
-import math
+from math import tanh  # saturates cleanly at +-1, no clamp needed
 
 from .genes import BIAS, INPUT, OUTPUT
-
-
-def tanh(x):
-    return math.tanh(max(-30.0, min(30.0, x)))
 
 
 class Brain:
