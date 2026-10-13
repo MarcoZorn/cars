@@ -85,7 +85,9 @@ def main():
     overrides = {}
     for kv in a.set:
         k, v = kv.split("=")
-        overrides[k] = type(getattr(Config, k))(v)
+        kind = type(getattr(Config, k))
+        # bool("False") is True, so booleans are read by name
+        overrides[k] = v.lower() in ("1", "true", "yes") if kind is bool else kind(v)
 
     t0 = time.time()
     jobs = [(a.seed0 + s, a.pop, a.gens, overrides) for s in range(a.seeds)]
