@@ -148,6 +148,9 @@ class Renderer:
         sc.set_clip((0, 0, self.cfg.view_w, self.cfg.view_h))
         pygame.draw.polygon(sc, TRACK, self.cam.scale(track.outer_pts.tolist()))
         pygame.draw.polygon(sc, BG, self.cam.scale(track.inner_pts.tolist()))
+        for px, py, rad in track.pillars:
+            x, y = self.cam.to_screen(px, py)
+            pygame.draw.circle(sc, BG, (int(x), int(y)), max(1, int(rad * self.cam.zoom)))
         for i in range(0, len(track.center_pts), 40):
             x, y = self.cam.to_screen(*track.center_pts[i])
             pygame.draw.circle(sc, (30, 33, 42), (int(x), int(y)), 1)
