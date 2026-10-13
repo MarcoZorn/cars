@@ -22,7 +22,7 @@ class Config:
     # mutation
     p_weight: float = 0.8
     p_weight_replace: float = 0.1
-    weight_step: float = 0.35
+    weight_step: float = 0.6     # was 0.35; 0.6 measured better on held-out tracks, see README
     weight_init_std: float = 1.0
     weight_cap: float = 8.0
     p_add_conn: float = 0.14

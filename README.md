@@ -61,6 +61,12 @@ track), and the held-out score is what still separates runs. The hard set
 | standard tracks | 14.4 | 13.1 | 1.3 |
 | hard tracks | 12.9 | 10.8 | 2.1 |
 
+Bigger weight mutations generalise better. With the weight step raised from
+0.35 to 0.6 (now the default), over 32 seeds on the hard set the held-out
+score went from 11.0 to 12.3 laps, and on the standard set from 13.1 to 13.5,
+with training scores up as well. A wider search finds drivers that rely less
+on the exact shape of the tracks they trained on.
+
 Tried on the hard set and not kept: scoring progress as a share of each
 track's lap instead of in pixels (the tracks differ in length by about 2x, so
 raw distance is not comparable from one generation to the next) came out at
