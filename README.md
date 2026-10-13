@@ -6,7 +6,7 @@ wall-detecting sensors, a neural net, and a genetic algorithm.
 ![600 cars driving an evolved neural network around a procedural track, with the leader's network drawn live](docs/demo.gif)
 
 <sub>Generation 16 of a live run. The panel on the right is the leader's actual network:
-its inputs are eight wall distances and its own speed, its outputs are steering and
+its inputs are wall distances and its own speed, its outputs are steering and
 throttle, and the hidden nodes between them were added by mutation, not by design.
 A browser version you can run without installing anything is at
 [neat-from-scratch](https://github.com/MarcoZorn/neat-from-scratch).</sub>
@@ -14,7 +14,7 @@ A browser version you can run without installing anything is at
 ## What it does
 
 - 1000 cars, 15 procedurally generated tracks, 250 generations
-- each car has 8 raycast sensors in a full ring (front, back, sides, diagonals)
+- each car has 16 raycast sensors in a full ring, one every 22.5 degrees
   plus its own speed as inputs, steering and throttle as outputs
 - crashing doesn't end a car's race - it respawns at the start line and keeps
   trying until it finishes a lap or runs out of time
@@ -129,6 +129,18 @@ A quarter of a lap worse, and faster laps. Not knowing your speed seems to
 mean keeping your foot down and steering by the walls alone, which crashes
 a little more and laps a tenth quicker when it works. The input stays, but
 it is doing much less than I thought.
+
+**How many rays?** Hard set, held-out laps, 32 seeds:
+
+| rays in the ring | 3 (front half) | 8 | 12 | 16 | 24 |
+|---|---|---|---|---|---|
+| held-out laps / 15 | 8.7 | 12.5 | 12.5 | 13.2 | 13.2 |
+
+Sixteen against eight again on 32 fresh seeds: 13.5 against 12.4, and laps
+5% faster. That is the biggest single gain in this README, for about 1.8
+times the compute per generation, and 16 is now the default. Past 16 it
+stops paying. (The eight-ray results above still stand as comparisons among
+themselves.)
 
 ## Files
 

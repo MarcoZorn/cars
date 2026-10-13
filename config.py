@@ -36,7 +36,7 @@ class Config:
     # 8 rays spanning the full circle: front, back, left, right and the four
     # diagonals, not just a forward cone - a car should feel what is beside
     # and behind it too, not only what it is about to hit.
-    n_rays: int = 8
+    n_rays: int = 16             # was 8; 16 measured better on held-out tracks, see README
     fov: float = 2 * math.pi      # a full circle of coverage
     ray_range: float = 220.0
     speed_input: bool = True      # the car feels its own speed (an experiment: does it need to?)

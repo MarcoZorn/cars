@@ -270,10 +270,8 @@ class Renderer:
             v = b.act.get(node, 0.0)
             r = (4 + 4 * min(1.0, abs(v))) * cfg.ui_scale
             pygame.draw.circle(self.screen, self._act_color(v), (int(x), int(y)), int(r))
-        compass = ["front", "front-R", "right", "back-R",
-                  "back", "back-L", "left", "front-L"]
-        names = ([compass[i] if i < len(compass) else f"ray{i}"
-                 for i in range(cfg.n_rays)] + ["speed"])
+        # each ray by its angle off the nose, so the labels follow any ray count
+        names = [f"{round(math.degrees(a)):+d}°" for a in ray_angles(cfg)] + ["speed"]
         for node, name in zip(b.inputs, names):
             x, y = pos[node]
             self.text(name, x - int(56 * cfg.ui_scale), y - 7, DIM, self.fs)
