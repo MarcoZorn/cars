@@ -5,7 +5,8 @@ Evolves a population for a number of generations on the usual track cycle,
 then races the whole final population on every track and scores the best
 generalist: how many of the tracks it laps, its mean lap fraction, and its
 mean lap time in ticks over the tracks it does lap (once everything laps
-every track, speed is what is left to tell runs apart). Judging
+every track, speed is what is left to tell runs apart). That same genome is
+then scored on a held-out set of tracks it never raced in training. Judging
 on all tracks, not on whichever track the last generation happened to race,
 is what makes two runs comparable.
 
@@ -23,6 +24,8 @@ from config import Config
 from neat_core.brain import Brain
 from neat_core.population import Population
 from tracks import build_tracks
+
+HOLDOUT = 1000  # held-out tracks: same difficulty curve, different seeds
 
 
 def race(genomes, track, cfg):
@@ -47,17 +50,27 @@ def run(args):
             c.genome.fitness = fitness(c, track, cfg)
         pop.evolve()
 
-    # every genome on every track: laps and lap fraction per genome
-    laps = np.zeros(len(pop.genomes))
-    frac = np.zeros(len(pop.genomes))
-    ticks = np.zeros(len(pop.genomes))
+    # every genome on every training track; the best generalist there is
+    # then raced on tracks it has never seen
+    best, train = pick(pop.genomes, tracks, cfg)
+    held = Config(**{**cfg.__dict__, "track_seed": cfg.track_seed + HOLDOUT})
+    _, test = pick([best], build_tracks(held), cfg)
+    return train, test
+
+
+def pick(genomes, tracks, cfg):
+    """Race every genome on every track; return the best one and its laps,
+    mean lap fraction and mean lap time (ticks, over the tracks it laps)."""
+    laps = np.zeros(len(genomes))
+    frac = np.zeros(len(genomes))
+    ticks = np.zeros(len(genomes))
     for track in tracks:
-        for i, c in enumerate(race(pop.genomes, track, cfg)):
+        for i, c in enumerate(race(genomes, track, cfg)):
             laps[i] += c.finished
             frac[i] += min(1.0, c.best_progress / track.lap_length)
             ticks[i] += c.ticks if c.finished else 0
-    best = int(np.argmax(laps * 10 + frac - ticks / (len(tracks) * cfg.max_ticks)))
-    return laps[best], frac[best] / len(tracks), ticks[best] / max(1, laps[best])
+    b = int(np.argmax(laps * 10 + frac - ticks / (len(tracks) * cfg.max_ticks)))
+    return genomes[b], (laps[b], frac[b] / len(tracks), ticks[b] / max(1, laps[b]))
 
 
 def main():
@@ -78,13 +91,15 @@ def main():
     jobs = [(a.seed0 + s, a.pop, a.gens, overrides) for s in range(a.seeds)]
     with Pool(min(len(jobs), 30)) as pool:
         res = pool.map(run, jobs)
-    laps = [r[0] for r in res]
-    fracs = [r[1] for r in res]
-    lap_ticks = [r[2] for r in res]
-    print(f"{' '.join(a.set) or 'baseline'}  pop={a.pop} gens={a.gens} seeds={a.seeds}")
-    print("  laps/15 per seed:", " ".join(f"{x:.0f}" for x in laps))
-    print(f"  laps mean {np.mean(laps):.2f}  lap-frac mean {np.mean(fracs):.3f}"
-          f"  lap ticks mean {np.mean(lap_ticks):.0f}  ({time.time() - t0:.0f}s)")
+    print(f"{' '.join(a.set) or 'baseline'}  pop={a.pop} gens={a.gens} seeds={a.seeds}"
+          f"  ({time.time() - t0:.0f}s)")
+    for name, k in (("train", 0), ("held-out", 1)):
+        laps = [r[k][0] for r in res]
+        print(f"  {name:8} laps/{len(build_tracks(Config(**overrides)))} per seed:",
+              " ".join(f"{x:.0f}" for x in laps))
+        print(f"  {name:8} laps mean {np.mean(laps):.2f}"
+              f"  lap-frac mean {np.mean([r[k][1] for r in res]):.3f}"
+              f"  lap ticks mean {np.mean([r[k][2] for r in res]):.0f}")
 
 
 if __name__ == "__main__":
