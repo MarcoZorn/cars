@@ -39,6 +39,7 @@ class Config:
     n_rays: int = 8
     fov: float = 2 * math.pi      # a full circle of coverage
     ray_range: float = 220.0
+    speed_input: bool = True      # the car feels its own speed (an experiment: does it need to?)
 
     # car physics (arcade model, not a real bicycle model)
     accel: float = 220.0          # px/s^2 at full throttle

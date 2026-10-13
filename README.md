@@ -115,6 +115,21 @@ weight step still holds up (hard set, 32 seeds, held-out laps): 11.5 at
 above this one, other than the first table, were measured with the bug in
 place.
 
+**Does a car need to feel its own speed?** The network has no memory, so
+without the speed input it cannot tell how fast it is going; the rays look
+the same at any speed. I expected that to be crippling. With the input
+silenced (`speed_input=False`), hard set, the same 32 seeds:
+
+| | training laps / 15 | held-out laps / 15 | held-out lap time |
+|---|---|---|---|
+| with speed | 13.9 | 12.5 | 260 |
+| without | 13.6 | 12.3 | 236 |
+
+A quarter of a lap worse, and faster laps. Not knowing your speed seems to
+mean keeping your foot down and steering by the walls alone, which crashes
+a little more and laps a tenth quicker when it works. The input stays, but
+it is doing much less than I thought.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)

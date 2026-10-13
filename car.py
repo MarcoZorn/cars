@@ -122,6 +122,8 @@ def sense_all(cars, track, cfg):
 
     speed = np.fromiter((c.v for c in cars), float, n) / cfg.max_speed
     speed = np.clip(speed, -0.3, 1.0)
+    if not cfg.speed_input:
+        speed = np.zeros(n)   # the input is still there, it just never says anything
     return np.column_stack([proximity, speed])
 
 
