@@ -166,6 +166,13 @@ pinches and every training set above is unchanged bit for bit. The one track
 it did change is held-out standard track 14 (19.2 to 21.0), so standard
 held-out scores from here on face a very slightly kinder exam.
 
+With all of that in (16 rays, fixed sharing, 30 training tracks), is more
+training time worth it? Hard set, 32 seeds: 40 generations, 13.53 held-out
+laps out of 15; 80 generations, 13.56. Training is solved by 40 (29.5 and
+29.8 of 30 training tracks lapped), and doubling it adds nothing on tracks
+it has not seen. What is left, about a lap and a half of the held-out set,
+is not a matter of practice.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
