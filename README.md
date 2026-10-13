@@ -75,6 +75,20 @@ track's lap instead of in pixels (the tracks differ in length by about 2x, so
 raw distance is not comparable from one generation to the next) came out at
 13.0 and 11.0, inside the noise between seeds.
 
+Do the rear rays earn their place? Five rays over the front half (the same
+five angles as the front of the ring: ahead, the diagonals, and both sides)
+against the full ring of eight, 32 seeds on the hard set:
+
+| | training laps / 15 | held-out laps / 15 | held-out lap time, ticks |
+|---|---|---|---|
+| ring of 8 | 13.5 | 12.1 | 248 |
+| front 5 | 13.8 | 12.1 | 274 |
+
+Exactly as many laps either way, but a driver that can see behind it laps
+about a tenth faster. My guess is the back diagonals: coming out of a corner
+they still see the wall the car is pulling away from, so it can put the
+power down earlier. The ring stays.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
