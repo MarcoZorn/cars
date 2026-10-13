@@ -14,7 +14,8 @@ A browser version you can run without installing anything is at
 ## What it does
 
 - 1000 cars, 15 procedurally generated tracks, 250 generations
-- each car has 7 raycast sensors + speed as inputs, steering + throttle as outputs
+- each car has 8 raycast sensors in a full ring (front, back, sides, diagonals)
+  plus its own speed as inputs, steering and throttle as outputs
 - crashing doesn't end a car's race - it respawns at the start line and keeps
   trying until it finishes a lap or runs out of time
 - fitness is the best single attempt, not the sum of attempts (so crash-spamming
@@ -39,12 +40,21 @@ Controls:
 - `[` `]` UI text size
 - `q` quit
 
+Headless, no window - evolve several seeds in parallel and score each run's
+best generalist on all 15 tracks (laps, lap fraction, lap time):
+
+```
+python bench.py --seeds 8 --pop 200 --gens 20
+python bench.py --set p_weight=0.5 weight_step=0.15   # any Config field
+```
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
 - `tracks.py` - track generation (polar functions, always simple closed loops)
 - `car.py` - physics, sensors, fitness
 - `app.py` / `render.py` - the live viewer
+- `bench.py` - headless multi-seed benchmark
 - `test_cars.py` - `python test_cars.py`
 
 MIT licensed.
