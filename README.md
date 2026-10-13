@@ -173,6 +173,21 @@ laps out of 15; 80 generations, 13.56. Training is solved by 40 (29.5 and
 it has not seen. What is left, about a lap and a half of the held-out set,
 is not a matter of practice.
 
+It is mostly one track. Which held-out tracks the best generalist laps, over
+16 seeds:
+
+| held-out track | 1-10 | 11 | 12 | 13 | 14 | 15 |
+|---|---|---|---|---|---|---|
+| lapped by | 15-16 each | 13 | 16 | 13 | 0 | 16 |
+
+Track 14, never. It is not impossible: a population raised on it alone laps
+it within 0 to 19 generations in eight seeds of eight (two of them in the
+first generation, by luck). It is a hard-set track with three pillars and
+its narrowest point at 20.2 px of half-width, and whatever it asks for is
+something no combination of the thirty training tracks teaches. One track
+the generalists all fail and a specialist learns in minutes is the gap
+between training and held-out scores in its plainest form.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
