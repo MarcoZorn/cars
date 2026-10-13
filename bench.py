@@ -3,7 +3,9 @@
 
 Evolves a population for a number of generations on the usual track cycle,
 then races the whole final population on every track and scores the best
-generalist: how many of the tracks it laps, and its mean lap fraction. Judging
+generalist: how many of the tracks it laps, its mean lap fraction, and its
+mean lap time in ticks over the tracks it does lap (once everything laps
+every track, speed is what is left to tell runs apart). Judging
 on all tracks, not on whichever track the last generation happened to race,
 is what makes two runs comparable.
 
@@ -48,12 +50,14 @@ def run(args):
     # every genome on every track: laps and lap fraction per genome
     laps = np.zeros(len(pop.genomes))
     frac = np.zeros(len(pop.genomes))
+    ticks = np.zeros(len(pop.genomes))
     for track in tracks:
         for i, c in enumerate(race(pop.genomes, track, cfg)):
             laps[i] += c.finished
             frac[i] += min(1.0, c.best_progress / track.lap_length)
-    best = int(np.argmax(laps * 10 + frac))
-    return laps[best], frac[best] / len(tracks)
+            ticks[i] += c.ticks if c.finished else 0
+    best = int(np.argmax(laps * 10 + frac - ticks / (len(tracks) * cfg.max_ticks)))
+    return laps[best], frac[best] / len(tracks), ticks[best] / max(1, laps[best])
 
 
 def main():
@@ -76,10 +80,11 @@ def main():
         res = pool.map(run, jobs)
     laps = [r[0] for r in res]
     fracs = [r[1] for r in res]
+    lap_ticks = [r[2] for r in res]
     print(f"{' '.join(a.set) or 'baseline'}  pop={a.pop} gens={a.gens} seeds={a.seeds}")
     print("  laps/15 per seed:", " ".join(f"{x:.0f}" for x in laps))
     print(f"  laps mean {np.mean(laps):.2f}  lap-frac mean {np.mean(fracs):.3f}"
-          f"  ({time.time() - t0:.0f}s)")
+          f"  lap ticks mean {np.mean(lap_ticks):.0f}  ({time.time() - t0:.0f}s)")
 
 
 if __name__ == "__main__":
