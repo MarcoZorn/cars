@@ -26,6 +26,10 @@ class Brain:
         for s, d, w in self.edges:
             self.incoming.setdefault(d, []).append((s, w))
         self.depth = self._depths(genome)
+        # the evaluation plan: every node that is computed, in order, with its
+        # incoming edges - built once so step() is just arithmetic
+        fixed = set(self.inputs) | set(self.bias)
+        self.plan = [(n, self.incoming.get(n, [])) for n in self.order if n not in fixed]
 
     def _topo(self, genome):
         indeg = {n: 0 for n in genome.nodes}
@@ -61,8 +65,9 @@ class Brain:
             a[n] = v
         for n in self.bias:
             a[n] = 1.0
-        for n in self.order:
-            if n in self.inputs or n in self.bias:
-                continue
-            a[n] = tanh(sum(a[s] * w for s, w in self.incoming.get(n, [])))
+        for n, inc in self.plan:
+            t = 0.0
+            for s, w in inc:
+                t += a[s] * w
+            a[n] = tanh(t)
         return [a[n] for n in self.outputs]
