@@ -10,19 +10,27 @@ import pygame
 from car import Car, N_OUTPUTS, fitness, n_inputs, step_all
 from config import Config
 from neat_core.brain import Brain
-from neat_core.population import Population
+from neat_core.population import Population, load, save
 from render import Renderer
 from tracks import build_tracks
 
 
 class App:
-    def __init__(self, cfg=None):
+    def __init__(self, cfg=None, resume=None):
         self.cfg = cfg or Config()
         pygame.init()
         self.fit_to_screen()
         self.render = Renderer(self.cfg)
-        self.tracks = build_tracks(self.cfg)
-        self.pop = Population(n_inputs(self.cfg), N_OUTPUTS, self.cfg)
+        if resume:
+            # the saved config wins for evolution (it holds the drifted
+            # compatibility threshold); the screen layout stays this one's
+            self.pop = load(resume)
+            layout = {k: getattr(self.cfg, k) for k in ("ui_scale", "panel_w", "stats_h", "view_w", "view_h")}
+            self.pop.cfg.__dict__.update(layout)
+            self.cfg = self.pop.cfg
+        else:
+            self.pop = Population(n_inputs(self.cfg), N_OUTPUTS, self.cfg)
+        self.tracks = build_tracks(self.cfg)   # after a load: the save's track set
         self.clock = pygame.time.Clock()
         self.paused = False
         self.fast = 1
@@ -112,6 +120,8 @@ class App:
                     cam.zoom_at(self.cfg.view_w / 2, self.cfg.view_h / 2, 1 / 1.35)
                 if e.key == pygame.K_0:
                     cam.fit()
+                if e.key == pygame.K_s:
+                    self.save()
                 if e.key == pygame.K_c:
                     cam.follow = None if cam.follow else self.leader()
                 if e.key == pygame.K_LEFTBRACKET:
@@ -119,6 +129,13 @@ class App:
                 if e.key == pygame.K_RIGHTBRACKET:
                     self.render.set_scale(self.cfg.ui_scale + 0.15)
         return True
+
+    def save(self):
+        import os
+        os.makedirs("saves", exist_ok=True)
+        path = f"saves/gen{self.pop.generation:04d}.pkl.gz"
+        save(self.pop, path)
+        print(f"saved {path}")
 
     def race_finished(self):
         return self.tick >= self.cfg.max_ticks or not any(c.alive for c in self.cars)
