@@ -11,7 +11,7 @@ import numpy as np
 from car import Car, N_OUTPUTS, fitness, n_inputs, ray_angles, sense_all, step_all
 from config import Config
 from neat_core.brain import Brain
-from neat_core.genes import Genome, Innovations
+from neat_core.genes import HIDDEN, Genome, Innovations
 from neat_core.population import Population, Species
 from tracks import build_tracks
 
@@ -263,10 +263,54 @@ def test_brain_output_is_bounded_and_deterministic():
     innov = Innovations()
     g = genome(cfg, innov)
     b = Brain(g)
-    x = [0.3, -0.2, 0.9, 0.0, 1.0, -0.7, 0.4, 0.6]
+    x = [0.3, -0.2, 0.9, 0.0, 1.0, -0.7, 0.4, 0.6, 0.5][:n_inputs(cfg)]
     a, b2 = b.step(x), b.step(x)
     assert a == b2
     assert all(-1.0 <= v <= 1.0 for v in a)
+
+
+
+def test_brain_evaluates_hidden_nodes_before_what_they_feed():
+    """A hand-built in -> hidden -> out chain must produce exactly the nested
+    tanh - if the evaluation order is wrong the output reads a stale 0."""
+    cfg = Config()
+    innov = Innovations()
+    g = Genome.minimal(n_inputs(cfg), N_OUTPUTS, innov, cfg)
+    for c in g.conns.values():
+        c.w = 0.0
+    src = sorted(g.ids("in"))[0]
+    out = sorted(g.ids("out"))[0]
+    h = innov.node()
+    g.nodes[h] = HIDDEN
+    g.add_conn(src, h, 2.0, innov)
+    g.add_conn(h, out, -1.5, innov)
+    x = [0.4] + [0.0] * (n_inputs(cfg) - 1)
+    got = Brain(g).step(x)[0]
+    assert abs(got - math.tanh(-1.5 * math.tanh(2.0 * 0.4))) < 1e-12
+
+
+def test_mutation_never_makes_a_cycle():
+    """The brain is feedforward only: after heavy structural mutation every
+    node must still land in the topological order."""
+    cfg = Config(p_add_conn=0.8, p_add_node=0.4)
+    innov = Innovations()
+    random.seed(5)
+    for _ in range(20):
+        g = genome(cfg, innov, n=60)
+        assert len(Brain(g).order) == len(g.nodes)
+
+
+def test_wall_lookup_matches_the_analytic_walls():
+    """on_track reads the walls from a table; just inside a wall must still
+    be on the track and just outside must be off, everywhere around."""
+    cfg = Config()
+    for t in build_tracks(cfg):
+        theta = np.linspace(-math.pi, math.pi, 5000)
+        r, hw = t.r_unit(theta), t.half_width(theta)
+        for edge in (r + hw, r - hw):
+            sign = np.sign(edge - r)
+            assert t.on_track(*t.to_world(theta, edge - sign * 0.05)).all(), t.name
+            assert not t.on_track(*t.to_world(theta, edge + sign * 0.05)).any(), t.name
 
 
 if __name__ == "__main__":
