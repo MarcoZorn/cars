@@ -61,6 +61,11 @@ track), and the held-out score is what still separates runs. The hard set
 | standard tracks | 14.4 | 13.1 | 1.3 |
 | hard tracks | 12.9 | 10.8 | 2.1 |
 
+Tried on the hard set and not kept: scoring progress as a share of each
+track's lap instead of in pixels (the tracks differ in length by about 2x, so
+raw distance is not comparable from one generation to the next) came out at
+13.0 and 11.0, inside the noise between seeds.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
