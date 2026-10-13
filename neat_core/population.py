@@ -86,7 +86,16 @@ class Population:
         for s in self.species:
             for g in s.members:
                 g.adjusted = g.fitness / len(s.members)
-        avg = [sum(g.adjusted for g in s.members) / len(s.members) for s in self.species]
+        # standard NEAT: a species' share is the sum of its members' adjusted
+        # fitness, i.e. its mean fitness. "square" divides by its size once
+        # more, "none" does not share at all
+        mode = self.cfg.sharing
+        if mode == "square":
+            avg = [sum(g.adjusted for g in s.members) / len(s.members) for s in self.species]
+        elif mode == "none":
+            avg = [sum(g.fitness for g in s.members) for s in self.species]
+        else:
+            avg = [sum(g.adjusted for g in s.members) for s in self.species]
         total = sum(avg) or 1.0
         room = self.cfg.pop_size
         counts = [max(1, int(room * a / total)) for a in avg]

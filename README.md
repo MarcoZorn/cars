@@ -92,6 +92,24 @@ without the ray pointing straight back (`n_rays=7 fov=1.5pi`) it is as slow
 as the front five alone. Whatever the full ring gives, it takes the ray
 that looks straight back, or the whole set. The ring stays.
 
+**A bug in fitness sharing.** NEAT divides each genome's fitness by the size
+of its species, and gives each species offspring in proportion to the sum of
+those shares, which comes to the species' mean fitness. This code averaged
+the shares instead of summing them, dividing by the species' size a second
+time, so a species twice as big got half the offspring it should have. With
+the standard rule (`sharing="mean"`, now the default), hard set, two batches
+of 32 seeds:
+
+| offspring per species | training laps / 15 | held-out laps / 15 | held-out lap time |
+|---|---|---|---|
+| mean fitness / size (the bug) | 13.5 / 13.2 | 12.1 / 11.8 | 248 / 232 |
+| mean fitness (standard) | 13.9 / 13.8 | 12.5 / 12.4 | 260 / 243 |
+| total fitness (no sharing) | 14.1 | 12.5 | 279 |
+
+Half a lap more on unseen tracks in both batches, at laps about 5% slower.
+No sharing at all matches it on laps and is slower still. The tables above
+this one were measured with the bug in place.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)

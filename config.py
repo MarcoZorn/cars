@@ -12,6 +12,7 @@ class Config:
     p_crossover: float = 0.75
     stagnation: int = 20
     target_species: int = 16
+    sharing: str = "mean"         # how species split the offspring: mean (standard NEAT) / square / none, see README
 
     # speciation
     compat_threshold: float = 3.0
