@@ -37,8 +37,18 @@ def race(genomes, track, cfg):
     return cars
 
 
+def parse(pairs):
+    out = {}
+    for kv in pairs:
+        k, v = kv.split("=")
+        kind = type(getattr(Config, k))
+        # bool("False") is True, so booleans are read by name
+        out[k] = v.lower() in ("1", "true", "yes") if kind is bool else kind(v)
+    return out
+
+
 def run(args):
-    seed, pop_size, gens, overrides, holdout = args
+    seed, pop_size, gens, overrides, holdout, exam = args
     random.seed(seed)
     np.random.seed(seed)
     cfg = Config(pop_size=pop_size, **overrides)
@@ -54,7 +64,7 @@ def run(args):
     # then raced on tracks it has never seen
     best, train = pick(pop.genomes, tracks, cfg)
     # the exam: --holdout held-out tracks (15 unless told otherwise)
-    held = Config(**{**cfg.__dict__, "track_seed": cfg.track_seed + HOLDOUT, "n_tracks": holdout or cfg.n_tracks})
+    held = Config(**{**cfg.__dict__, "track_seed": cfg.track_seed + HOLDOUT, "n_tracks": holdout or cfg.n_tracks, **exam})
     _, test = pick([best], build_tracks(held), cfg)
     return train, test
 
@@ -80,19 +90,17 @@ def main():
     p.add_argument("--seed0", type=int, default=1)
     p.add_argument("--pop", type=int, default=200)
     p.add_argument("--gens", type=int, default=60)
+    p.add_argument("--exam", nargs="*", default=[],
+                   help="Config fields for the held-out tracks only, e.g. track_obstacles=3")
     p.add_argument("--holdout", type=int, default=15, help="held-out tracks, the same exam whatever the training set (0: as many as trained on)")
     p.add_argument("--set", nargs="*", default=[],
                    help="config overrides, e.g. p_weight=0.5 weight_step=0.15")
     a = p.parse_args()
-    overrides = {}
-    for kv in a.set:
-        k, v = kv.split("=")
-        kind = type(getattr(Config, k))
-        # bool("False") is True, so booleans are read by name
-        overrides[k] = v.lower() in ("1", "true", "yes") if kind is bool else kind(v)
+    overrides = parse(a.set)
 
     t0 = time.time()
-    jobs = [(a.seed0 + s, a.pop, a.gens, overrides, a.holdout) for s in range(a.seeds)]
+    exam = parse(a.exam)
+    jobs = [(a.seed0 + s, a.pop, a.gens, overrides, a.holdout, exam) for s in range(a.seeds)]
     with Pool(min(len(jobs), 30)) as pool:
         res = pool.map(run, jobs)
     print(f"{' '.join(a.set) or 'baseline'}  pop={a.pop} gens={a.gens} seeds={a.seeds}"
