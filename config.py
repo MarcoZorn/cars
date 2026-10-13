@@ -63,6 +63,7 @@ class Config:
     n_tracks: int = 15
     track_seed: int = 100         # tracks are fixed, independent of run seed
     track_hardness: float = 1.0   # difficulty of the last track; >1 is a harder set
+    track_obstacles: int = 0      # pillars on the last track, fewer on earlier ones
 
     # view
     view_w: int = 1200

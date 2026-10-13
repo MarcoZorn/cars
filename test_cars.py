@@ -313,6 +313,27 @@ def test_wall_lookup_matches_the_analytic_walls():
             assert not t.on_track(*t.to_world(theta, edge + sign * 0.05)).any(), t.name
 
 
+
+def test_pillars_block_one_side_and_leave_the_other_open():
+    """A pillar is solid, the start line stays clear, and at every pillar
+    there is still a lane past it wide enough for the car."""
+    cfg = Config(track_obstacles=6)
+    tracks = build_tracks(cfg)
+    assert not tracks[0].pillars and len(tracks[-1].pillars) == 6
+    for t in tracks:
+        assert t.on_track(*t.start_xy), f"{t.name}: start line blocked"
+        for px, py, rad in t.pillars:
+            assert not t.on_track(px, py)
+            theta, r = t.from_world(px, py)
+            rc, hw = t.r_unit(theta), t.half_width(theta)
+            side = 1 if r > rc else -1
+            # the open side: from the far wall to the pillar's edge
+            lane = np.linspace(rc - side * hw * 0.9, rc - side * hw * 0.05, 30)
+            assert t.on_track(*t.to_world(np.full(30, theta), lane)).all(), \
+                f"{t.name}: no lane left past a pillar"
+            assert hw * 0.85 * min(t.sx, t.sy) > cfg.car_w * 2
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     for t in tests:

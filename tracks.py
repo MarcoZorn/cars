@@ -30,6 +30,11 @@ CANVAS_H = 1000
 SAMPLES = 1440  # centerline resolution, used for rendering and arc length
 LUT_SAMPLES = 1 << 16  # wall lookup table resolution, for collision tests
 
+# a pillar's centre sits this far off the centerline and is this big, both as
+# fractions of the local half width: it blocks one side, the other stays open
+PILLAR_OFFSET = 0.5
+PILLAR_RADIUS = 0.3
+
 # how far the width is allowed to swing around its base fraction - clipped so
 # a "narrow" stretch is tight but never impassably so
 WIDTH_SWING_MIN = 0.55
@@ -37,7 +42,7 @@ WIDTH_SWING_MAX = 1.45
 
 
 class Track:
-    def __init__(self, seed, name=None, difficulty=0.0):
+    def __init__(self, seed, name=None, difficulty=0.0, obstacles=0):
         rng = random.Random(seed)
         self.seed = seed
         self.name = name or f"Track {seed}"
@@ -69,6 +74,20 @@ class Track:
         ]
 
         self._build()
+
+        # pillars standing in the road, each pushed toward one wall so the
+        # other side stays open - drawn after everything else so adding them
+        # leaves the rest of the track exactly as it was. None near the start
+        # line, or a car could respawn straight into one.
+        self.pillars = []
+        for k in range(obstacles):
+            th = -math.pi + 2 * math.pi * (k + rng.uniform(0.25, 0.75)) / obstacles
+            th = max(-math.pi + 0.4, min(math.pi - 0.4, th))
+            rc, hw = float(self.r_unit(th)), float(self.half_width(th))
+            side = rng.choice((-1, 1))
+            px, py = self.to_world(th, rc + side * PILLAR_OFFSET * hw)
+            rad = PILLAR_RADIUS * hw * min(self.sx, self.sy)
+            self.pillars.append((float(px), float(py), rad))
 
     # --- the analytic track shape ---
 
@@ -114,7 +133,11 @@ class Track:
         # every harmonic for every one of the few thousand points a tick
         # tests - nearest entry, a few hundredths of a pixel off the walls
         i = ((theta + math.pi) * (LUT_SAMPLES / (2 * math.pi)) + 0.5).astype(np.intp)
-        return (r >= self._lut_lo[i]) & (r <= self._lut_hi[i])
+        on = (r >= self._lut_lo[i]) & (r <= self._lut_hi[i])
+        x, y = np.asarray(x), np.asarray(y)
+        for px, py, rad in self.pillars:
+            on &= (x - px) ** 2 + (y - py) ** 2 > rad * rad
+        return on
 
     # --- precomputed geometry, arc length, start line ---
 
@@ -158,5 +181,6 @@ class Track:
 def build_tracks(cfg):
     n = cfg.n_tracks
     return [Track(cfg.track_seed + i, name=f"Track {i + 1}",
-                  difficulty=cfg.track_hardness * i / max(1, n - 1))
+                  difficulty=cfg.track_hardness * i / max(1, n - 1),
+                  obstacles=round(cfg.track_obstacles * i / max(1, n - 1)))
             for i in range(n)]
