@@ -42,7 +42,6 @@ class App:
         self.cfg.view_h = h - self.cfg.stats_h
 
     def new_generation(self):
-        self.pop.speciate()
         self.track = self.tracks[self.pop.generation % len(self.tracks)]
         self.cars = [Car(g, Brain(g), self.track, self.cfg) for g in self.pop.genomes]
         self.tick = 0

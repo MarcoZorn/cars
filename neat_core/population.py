@@ -39,6 +39,7 @@ class Population:
         self.history = []
         proto = Genome.minimal(n_in, n_out, self.innov, cfg)
         self.genomes = [proto.copy().mutate(self.innov, cfg) for _ in range(cfg.pop_size)]
+        self.speciate()
 
     def speciate(self):
         cfg = self.cfg
@@ -103,8 +104,9 @@ class Population:
         return child.mutate(self.innov, cfg)
 
     def evolve(self):
-        """Called once every genome has raced. Produces the next generation."""
-        self.speciate()
+        """Called once every genome has raced. Produces the next generation,
+        already sorted into species - so the race can show species, and each
+        generation is speciated exactly once."""
         champion = max(self.genomes, key=lambda g: g.fitness)
         if self.best is None or champion.fitness > self.best.fitness:
             self.best = champion.copy()
@@ -129,3 +131,4 @@ class Population:
         while len(self.genomes) < self.cfg.pop_size:
             self.genomes.append(self.breed(random.choice(self.species)))
         self.generation += 1
+        self.speciate()
