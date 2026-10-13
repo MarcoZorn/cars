@@ -98,8 +98,12 @@ class Track:
         return x, y
 
     def from_world(self, x, y):
-        x0 = (np.asarray(x, dtype=float) - self.cx) / self.sx
-        y0 = (np.asarray(y, dtype=float) - self.cy) / self.sy
+        # float32 input stays float32: the sensor march tests tens of
+        # thousands of points a tick, and arctan2 is ~3x faster in single
+        # precision while still exact to well under a pixel
+        dt = np.float32 if getattr(x, "dtype", None) == np.float32 else float
+        x0 = (np.asarray(x, dtype=dt) - dt(self.cx)) / dt(self.sx)
+        y0 = (np.asarray(y, dtype=dt) - dt(self.cy)) / dt(self.sy)
         theta = np.arctan2(y0, x0)
         r = np.hypot(x0, y0)
         return theta, r

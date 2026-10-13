@@ -111,7 +111,8 @@ def sense_all(cars, track, cfg):
     px = xs + np.cos(ang) * dist                                     # N,R,S
     py = ys + np.sin(ang) * dist
 
-    on = track.on_track(px.ravel(), py.ravel()).reshape(n, cfg.n_rays, steps)
+    on = track.on_track(px.ravel().astype(np.float32),
+                        py.ravel().astype(np.float32)).reshape(n, cfg.n_rays, steps)
     off = ~on
     off[:, :, 0] = False  # the car's own position is always "on"
     first_off = np.argmax(off, axis=2)                               # N,R
