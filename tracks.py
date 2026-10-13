@@ -42,7 +42,7 @@ WIDTH_SWING_MAX = 1.45
 
 
 class Track:
-    def __init__(self, seed, name=None, difficulty=0.0, obstacles=0):
+    def __init__(self, seed, name=None, difficulty=0.0, obstacles=0, min_half_width=0.0):
         rng = random.Random(seed)
         self.seed = seed
         self.name = name or f"Track {seed}"
@@ -72,6 +72,12 @@ class Track:
             (rng.randint(2, 5), wamp / max(1, n_wharm), rng.uniform(0, 2 * math.pi))
             for _ in range(n_wharm)
         ]
+        # a chicane that pinches below min_half_width is toned down until it
+        # does not (draws nothing from rng, so the rest of the track is the same)
+        for _ in range(12):
+            if not min_half_width or self.half_width(np.linspace(-math.pi, math.pi, SAMPLES)).min() > min_half_width:
+                break
+            self.width_harmonics = [(k, a * 0.8, ph) for k, a, ph in self.width_harmonics]
 
         self._build()
 
@@ -182,5 +188,8 @@ def build_tracks(cfg):
     n = cfg.n_tracks
     return [Track(cfg.track_seed + i, name=f"Track {i + 1}",
                   difficulty=cfg.track_hardness * i / max(1, n - 1),
-                  obstacles=round(cfg.track_obstacles * i / max(1, n - 1)))
+                  obstacles=round(cfg.track_obstacles * i / max(1, n - 1)),
+                  # the standard set keeps three car widths of room everywhere;
+                  # the hard set is allowed its pinches
+                  min_half_width=cfg.car_w * 3 if cfg.track_hardness <= 1 else 0.0)
             for i in range(n)]
