@@ -38,7 +38,7 @@ def race(genomes, track, cfg):
 
 
 def run(args):
-    seed, pop_size, gens, overrides = args
+    seed, pop_size, gens, overrides, holdout = args
     random.seed(seed)
     np.random.seed(seed)
     cfg = Config(pop_size=pop_size, **overrides)
@@ -53,7 +53,8 @@ def run(args):
     # every genome on every training track; the best generalist there is
     # then raced on tracks it has never seen
     best, train = pick(pop.genomes, tracks, cfg)
-    held = Config(**{**cfg.__dict__, "track_seed": cfg.track_seed + HOLDOUT})
+    # the exam: held-out tracks, as many as trained on unless --holdout says
+    held = Config(**{**cfg.__dict__, "track_seed": cfg.track_seed + HOLDOUT, "n_tracks": holdout or cfg.n_tracks})
     _, test = pick([best], build_tracks(held), cfg)
     return train, test
 
@@ -79,6 +80,7 @@ def main():
     p.add_argument("--seed0", type=int, default=1)
     p.add_argument("--pop", type=int, default=200)
     p.add_argument("--gens", type=int, default=60)
+    p.add_argument("--holdout", type=int, default=0, help="held-out tracks (default: as many as trained on)")
     p.add_argument("--set", nargs="*", default=[],
                    help="config overrides, e.g. p_weight=0.5 weight_step=0.15")
     a = p.parse_args()
@@ -90,14 +92,15 @@ def main():
         overrides[k] = v.lower() in ("1", "true", "yes") if kind is bool else kind(v)
 
     t0 = time.time()
-    jobs = [(a.seed0 + s, a.pop, a.gens, overrides) for s in range(a.seeds)]
+    jobs = [(a.seed0 + s, a.pop, a.gens, overrides, a.holdout) for s in range(a.seeds)]
     with Pool(min(len(jobs), 30)) as pool:
         res = pool.map(run, jobs)
     print(f"{' '.join(a.set) or 'baseline'}  pop={a.pop} gens={a.gens} seeds={a.seeds}"
           f"  ({time.time() - t0:.0f}s)")
     for name, k in (("train", 0), ("held-out", 1)):
         laps = [r[k][0] for r in res]
-        print(f"  {name:8} laps/{len(build_tracks(Config(**overrides)))} per seed:",
+        total = Config(**overrides).n_tracks if k == 0 or not a.holdout else a.holdout
+        print(f"  {name:8} laps/{total} per seed:",
               " ".join(f"{x:.0f}" for x in laps))
         print(f"  {name:8} laps mean {np.mean(laps):.2f}"
               f"  lap-frac mean {np.mean([r[k][1] for r in res]):.3f}"
