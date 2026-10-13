@@ -158,5 +158,5 @@ class Track:
 def build_tracks(cfg):
     n = cfg.n_tracks
     return [Track(cfg.track_seed + i, name=f"Track {i + 1}",
-                  difficulty=i / max(1, n - 1))
+                  difficulty=cfg.track_hardness * i / max(1, n - 1))
             for i in range(n)]
