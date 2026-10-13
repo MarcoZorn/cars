@@ -8,6 +8,8 @@ one strategy cannot simply dominate by having more copies of itself; the next
 generation is bred from the best of each species, with elitism keeping the
 current champions untouched.
 """
+import gzip
+import pickle
 import random
 from itertools import count
 
@@ -132,3 +134,23 @@ class Population:
             self.genomes.append(self.breed(random.choice(self.species)))
         self.generation += 1
         self.speciate()
+
+
+def save(pop, path):
+    """Everything needed to carry on: the population (genomes, species,
+    innovation registry, history), its config, which carries the
+    compatibility threshold as it has drifted, and the random state, so a
+    resumed run continues the same stream."""
+    with gzip.open(path, "wb") as f:
+        pickle.dump({"pop": pop, "rng": random.getstate()}, f)
+
+
+def load(path):
+    with gzip.open(path, "rb") as f:
+        data = pickle.load(f)
+    pop = data["pop"]
+    random.setstate(data["rng"])
+    # species ids come from a module-wide counter; carry on above the saved ones
+    top = max((s.id for s in pop.species), default=0)
+    Species._ids = count(top + 1)
+    return pop
