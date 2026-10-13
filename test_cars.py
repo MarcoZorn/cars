@@ -12,7 +12,7 @@ from car import Car, N_OUTPUTS, fitness, n_inputs, ray_angles, sense_all, step_a
 from config import Config
 from neat_core.brain import Brain
 from neat_core.genes import Genome, Innovations
-from neat_core.population import Population
+from neat_core.population import Population, Species
 from tracks import build_tracks
 
 
@@ -232,6 +232,30 @@ def test_evolution_produces_a_new_generation_with_history():
     assert len(pop.genomes) == cfg.pop_size
     assert len(pop.history) == 1
     assert pop.best is not None
+
+
+def test_stagnation_never_culls_the_only_improving_species():
+    """With one species still improving and the rest stale, the cull keeps a
+    stale runner-up for diversity - it must never keep two stale species and
+    throw the improving one away."""
+    cfg = Config(pop_size=30, stagnation=3)
+    pop = Population(n_inputs(cfg), N_OUTPUTS, cfg)
+    gs = pop.genomes
+    species = []
+    for i in range(3):
+        s = Species(gs[i * 10])
+        s.members = gs[i * 10:(i + 1) * 10]
+        for g in s.members:
+            g.fitness = float(i + 1)
+        s.best, s.stale = 100.0, 10
+        species.append(s)
+    fresh = species[0]
+    fresh.best, fresh.stale = 0.0, 0
+    pop.species = list(species)
+    pop._cull()
+    assert fresh in pop.species, "the only improving species was culled"
+    assert species[2] in pop.species, "the strongest stale species should be kept"
+    assert len(pop.species) == 2
 
 
 def test_brain_output_is_bounded_and_deterministic():

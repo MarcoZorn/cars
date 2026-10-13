@@ -71,8 +71,13 @@ class Population:
             keep = max(2, int(len(s.members) * cfg.survival))
             s.members = s.members[:keep]
         alive = [s for s in self.species if s.stale < cfg.stagnation]
+        if len(alive) == 1:
+            # never down to a single species: keep the strongest stale one
+            # alongside it, but never at the cost of the one still improving
+            stale = [s for s in self.species if s is not alive[0]]
+            alive += sorted(stale, key=lambda s: s.members[0].fitness, reverse=True)[:1]
         if alive:
-            self.species = alive if len(alive) > 1 else self.species[:2]
+            self.species = [s for s in self.species if s in alive]
 
     def _offspring_counts(self):
         for s in self.species:
