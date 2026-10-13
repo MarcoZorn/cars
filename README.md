@@ -13,7 +13,7 @@ A browser version you can run without installing anything is at
 
 ## What it does
 
-- 1000 cars, 15 procedurally generated tracks, 250 generations
+- 1000 cars, 30 procedurally generated tracks, 250 generations
 - each car has 16 raycast sensors in a full ring, one every 22.5 degrees
   plus its own speed as inputs, steering and throttle as outputs
 - crashing doesn't end a car's race - it respawns at the start line and keeps
@@ -154,9 +154,11 @@ training set, so laps out of 15 would not compare):
 | 30 | 98.4% | 91.3% |
 
 Five tracks are learned perfectly and generalise no better than fifteen;
-thirty generalise best, for free. The default stays at 15 for now, since a
-held-out set of thirty is a different exam, but it is the next thing worth
-settling.
+thirty generalise best, for free. On the same exam (`--holdout 15`, now
+the default, so every number here stays out of 15), two batches of 32 seeds:
+13.53 and 13.69 held-out laps training on thirty tracks, against 13.16 and
+13.53 on fifteen. Small, but the same way twice and it costs nothing, so the
+default is now thirty.
 
 ## Files
 

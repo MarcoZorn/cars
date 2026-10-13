@@ -53,7 +53,7 @@ def run(args):
     # every genome on every training track; the best generalist there is
     # then raced on tracks it has never seen
     best, train = pick(pop.genomes, tracks, cfg)
-    # the exam: held-out tracks, as many as trained on unless --holdout says
+    # the exam: --holdout held-out tracks (15 unless told otherwise)
     held = Config(**{**cfg.__dict__, "track_seed": cfg.track_seed + HOLDOUT, "n_tracks": holdout or cfg.n_tracks})
     _, test = pick([best], build_tracks(held), cfg)
     return train, test
@@ -80,7 +80,7 @@ def main():
     p.add_argument("--seed0", type=int, default=1)
     p.add_argument("--pop", type=int, default=200)
     p.add_argument("--gens", type=int, default=60)
-    p.add_argument("--holdout", type=int, default=0, help="held-out tracks (default: as many as trained on)")
+    p.add_argument("--holdout", type=int, default=15, help="held-out tracks, the same exam whatever the training set (0: as many as trained on)")
     p.add_argument("--set", nargs="*", default=[],
                    help="config overrides, e.g. p_weight=0.5 weight_step=0.15")
     a = p.parse_args()
