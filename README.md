@@ -46,7 +46,20 @@ best generalist on all 15 tracks (laps, lap fraction, lap time):
 ```
 python bench.py --seeds 8 --pop 200 --gens 20
 python bench.py --set p_weight=0.5 weight_step=0.15   # any Config field
+python bench.py --set track_hardness=1.6 track_obstacles=3   # the hard set
 ```
+
+The winner is also raced on fifteen held-out tracks it never saw in
+training, same difficulty curve, different seeds. On the standard set the
+task saturates (by generation 40 nearly every run laps every training
+track), and the held-out score is what still separates runs. The hard set
+(sharper, narrower tracks, pillars on the hardest) does not saturate.
+16 seeds, population 200, 40 generations:
+
+| | training laps / 15 | held-out laps / 15 | gap |
+|---|---|---|---|
+| standard tracks | 14.4 | 13.1 | 1.3 |
+| hard tracks | 12.9 | 10.8 | 2.1 |
 
 ## Files
 
