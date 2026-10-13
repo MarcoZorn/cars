@@ -88,23 +88,30 @@ def test_tracks_do_not_pinch_shut():
 
 def test_difficulty_actually_makes_later_tracks_harder():
     """The curriculum only means anything if the geometry really changes -
-    otherwise track 15 is just track 1 with a different name."""
+    otherwise the last track is just the first with a different name.
+
+    Compared a third of the set at a time, not first against last: any two
+    tracks are different random shapes. The centerline itself hardly ramps
+    (more harmonics, each smaller, so about the same overall wobble); what
+    does is the number of bends and the width chicanes."""
     cfg = Config()
     tracks = build_tracks(cfg)
-    easiest, hardest = tracks[0], tracks[-1]
+    k = len(tracks) // 3
+    easy, hard = tracks[:k], tracks[-k:]
 
-    def wobble(t):
-        theta = t.theta_samples
-        r = t.r_unit(theta)
-        return float(np.std(r) / t.base_r)
+    def mean(f, ts):
+        return float(np.mean([f(t) for t in ts]))
+
+    def bends(t):
+        return len(t.harmonics)
 
     def width_variation(t):
         return float(t.width_mult(t.theta_samples).std())
 
-    assert wobble(hardest) > wobble(easiest), \
-        "the hardest track's centerline should wobble more than the easiest"
-    assert width_variation(hardest) >= width_variation(easiest), \
-        "the hardest track should vary in width at least as much as the easiest"
+    assert mean(bends, hard) > mean(bends, easy), \
+        "the hardest tracks should have more bends than the easiest"
+    assert mean(width_variation, hard) > mean(width_variation, easy), \
+        "the hardest tracks should vary in width more than the easiest"
 
 
 def test_every_track_stays_wide_enough_for_the_car():
