@@ -30,6 +30,7 @@ Tracks cycle each generation so the population doesn't just memorize one loop.
 pip install -r requirements.txt
 python run.py
 python run.py --hard   # sharper, narrower tracks, pillars on the hardest
+python run.py --load saves/gen0040.pkl.gz   # carry on from a save
 ```
 
 Controls:
@@ -38,6 +39,7 @@ Controls:
 - `f` speed (1x / 4x / 16x)
 - `+` / `-` / mouse wheel zoom, drag to pan, `0` to fit
 - `c` follow the leader car
+- `s` save the population to `saves/` (resume it with `--load`)
 - `[` `]` UI text size
 - `q` quit
 
