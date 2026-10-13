@@ -142,6 +142,22 @@ times the compute per generation, and 16 is now the default. Past 16 it
 stops paying. (The eight-ray results above still stand as comparisons among
 themselves.)
 
+**How many training tracks?** Each generation races one track, cycling
+through the set, so more tracks costs nothing extra. Hard set, 16 rays, 32
+seeds, as a share of tracks lapped (the held-out set is the same size as the
+training set, so laps out of 15 would not compare):
+
+| training tracks | training tracks lapped | held-out tracks lapped |
+|---|---|---|
+| 5 | 100% | 87.6% |
+| 15 | 93.9% | 87.7% |
+| 30 | 98.4% | 91.3% |
+
+Five tracks are learned perfectly and generalise no better than fifteen;
+thirty generalise best, for free. The default stays at 15 for now, since a
+held-out set of thirty is a different exam, but it is the next thing worth
+settling.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
