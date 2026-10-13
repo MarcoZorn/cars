@@ -188,6 +188,13 @@ something no combination of the thirty training tracks teaches. One track
 the generalists all fail and a specialist learns in minutes is the gap
 between training and held-out scores in its plainest form.
 
+Which part of it? The same sixteen generalists on track 14 with its
+pillars taken away and everything else unchanged: 11 of 16 lap it. The
+pillars are most of the problem, the shape the rest. Pillars are not new to
+them, the hardest training tracks have two or three, so it is presumably
+where these ones stand, near the pinch, that nothing in training
+resembles.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
