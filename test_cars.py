@@ -334,6 +334,30 @@ def test_pillars_block_one_side_and_leave_the_other_open():
             assert hw * 0.85 * min(t.sx, t.sy) > cfg.car_w * 2
 
 
+def test_a_save_carries_on_exactly():
+    import os
+    import tempfile
+    from neat_core.population import load, save
+    random.seed(11)
+    cfg = Config(pop_size=40)
+    pop = Population(n_inputs(cfg), N_OUTPUTS, cfg)
+    for g in pop.genomes:
+        g.fitness = random.random() * 100
+    pop.evolve()
+    path = os.path.join(tempfile.mkdtemp(), "pop.pkl.gz")
+    save(pop, path)
+
+    def next_gen(p):
+        for g in p.genomes:
+            g.fitness = random.random() * 100
+        p.evolve()
+        return [sorted((k, c.w, c.enabled) for k, c in g.conns.items()) for g in p.genomes]
+
+    a = next_gen(pop)
+    b = next_gen(load(path))
+    assert a == b, "a reloaded population must evolve exactly as the original"
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     for t in tests:
