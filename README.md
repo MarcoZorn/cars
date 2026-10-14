@@ -203,7 +203,9 @@ More pillars in training, then? Up to six on the hardest training tracks,
 the exam left at three (`--set track_obstacles=6 --exam track_obstacles=3`):
 13.47 held-out laps, against 13.53. No better. (Now and then a seed does
 lap all fifteen, here and in earlier runs, so track 14 is not beyond a
-generalist; more pillars in general is just not what teaches it.)
+generalist; more pillars in general is just not what teaches it.) Nor does
+training both ways round (`both_ways`, below): track 14 lapped by 1 seed in
+16, its pillar-free version by 9.
 
 **One-handed drivers.** Every track is driven the same way round, so the
 drivers learn to drive one way round. Mirroring a track top to bottom (`Track(...,
