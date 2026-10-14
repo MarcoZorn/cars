@@ -33,12 +33,12 @@ class Config:
     add_conn_tries: int = 20
 
     # sensors: rays fanned across the windshield, plus own speed
-    # 8 rays spanning the full circle: front, back, left, right and the four
-    # diagonals, not just a forward cone - a car should feel what is beside
-    # and behind it too, not only what it is about to hit.
+    # rays spanning the full circle, not just a forward cone - a car should
+    # feel what is beside and behind it too, not only what it is about to hit.
     n_rays: int = 16             # was 8; 16 measured better on held-out tracks, see README
     fov: float = 2 * math.pi      # a full circle of coverage
     ray_range: float = 220.0
+    ray_steps: int = 20           # points sampled along each ray
     speed_input: bool = True      # the car feels its own speed (an experiment: does it need to?)
 
     # car physics (arcade model, not a real bicycle model)

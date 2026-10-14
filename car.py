@@ -98,7 +98,7 @@ def sense_all(cars, track, cfg):
     first miss per (car, ray) with numpy instead of a python loop.
     """
     n = len(cars)
-    steps = 20
+    steps = cfg.ray_steps
     t = np.linspace(0.0, 1.0, steps)[None, None, :]                 # 1,1,S
     ray_off = np.array(ray_angles(cfg))[None, :, None]              # 1,R,1
 
