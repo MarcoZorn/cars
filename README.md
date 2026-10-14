@@ -195,6 +195,12 @@ them, the hardest training tracks have two or three, so it is presumably
 where these ones stand, near the pinch, that nothing in training
 resembles.
 
+More pillars in training, then? Up to six on the hardest training tracks,
+the exam left at three (`--set track_obstacles=6 --exam track_obstacles=3`):
+13.47 held-out laps, against 13.53. No better. For the first time one seed
+in 32 lapped all fifteen held-out tracks, so track 14 is not beyond a
+generalist, but more pillars in general is not what teaches it.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
