@@ -235,7 +235,9 @@ a slow machine, 10 is a fair trade.
 
 **Who gets to breed.** The share of each species allowed to have children
 (`survival`, 0.4) makes no difference across 0.2 to 0.6: 13.53, 13.53 and
-13.38 held-out laps, hard set, 32 seeds. It stays.
+13.38 held-out laps, hard set, 32 seeds. It stays. Nor does elitism, the top cars
+of each species copied unchanged: 13.28 with none, 13.53 with 2, 13.28
+with 5.
 
 ## Files
 
