@@ -224,6 +224,13 @@ comparable; `python run.py --set both_ways=true` raises two-handed drivers.
 record holder lapped nothing mirrored, and the best generalist 24 laps
 against 106.)
 
+**Cheaper rays.** Each ray is sampled at 20 points along its length. At 10
+(`--set ray_steps=10`) the drivers lap as many held-out tracks (13.47 against
+13.53) and the benchmark runs about 40% faster (634 s against 1051), but
+their laps are 5% slower (236 ticks against 224): a coarser picture of the
+road costs a little pace, not the ability to get round. It stays at 20; on
+a slow machine, 10 is a fair trade.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
