@@ -171,7 +171,10 @@ training time worth it? Hard set, 32 seeds: 40 generations, 13.53 held-out
 laps out of 15; 80 generations, 13.56. Training is solved by 40 (29.5 and
 29.8 of 30 training tracks lapped), and doubling it adds nothing on tracks
 it has not seen. What is left, about a lap and a half of the held-out set,
-is not a matter of practice.
+is not a matter of practice. Nor of how the same compute is spent: 100 cars
+for 80 generations, 200 for 40 and 400 for 20 score 13.44, 13.53 and 13.28,
+inside the noise (the small population is the quickest to run, 676 seconds
+against 1051 and 1805).
 
 It is mostly one track. Which held-out tracks the best generalist laps, over
 16 seeds:
