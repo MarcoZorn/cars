@@ -42,7 +42,7 @@ WIDTH_SWING_MAX = 1.45
 
 
 class Track:
-    def __init__(self, seed, name=None, difficulty=0.0, obstacles=0, min_half_width=0.0):
+    def __init__(self, seed, name=None, difficulty=0.0, obstacles=0, min_half_width=0.0, mirror=False):
         rng = random.Random(seed)
         self.seed = seed
         self.name = name or f"Track {seed}"
@@ -62,6 +62,9 @@ class Track:
         # anisotropic stretch: ovals and elongated loops, never a self-cross
         self.sx = rng.uniform(0.75, 1.35)
         self.sy = rng.uniform(0.75, 1.35)
+        # mirrored top to bottom, the track is driven the other way round
+        if mirror:
+            self.sy = -self.sy
         self.width_frac = rng.uniform(0.12, 0.16)
 
         # width variation: flat (constant width) on easy tracks, real
@@ -191,5 +194,6 @@ def build_tracks(cfg):
                   obstacles=round(cfg.track_obstacles * i / max(1, n - 1)),
                   # the standard set keeps three car widths of room everywhere;
                   # the hard set is allowed its pinches
-                  min_half_width=cfg.car_w * 3 if cfg.track_hardness <= 1 else 0.0)
+                  min_half_width=cfg.car_w * 3 if cfg.track_hardness <= 1 else 0.0,
+                  mirror=cfg.both_ways and i % 2 == 1)
             for i in range(n)]

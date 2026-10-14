@@ -205,6 +205,24 @@ the exam left at three (`--set track_obstacles=6 --exam track_obstacles=3`):
 lap all fifteen, here and in earlier runs, so track 14 is not beyond a
 generalist; more pillars in general is just not what teaches it.)
 
+**One-handed drivers.** Every track is driven the same way round, so the
+drivers learn to drive one way round. Mirroring a track top to bottom (`Track(...,
+mirror=True)`) makes it go the other way; the best generalist of sixteen
+seeds, hard set, on the fifteen held-out tracks each way:
+
+| raised on | held-out laps, the usual way | mirrored |
+|---|---|---|
+| tracks all going one way | 13.6 | 9.1 |
+| every other track mirrored (`both_ways=True`) | 13.2 | 13.1 |
+
+A third of a lap given up the usual way round for four laps gained the other
+way. Even a ring of sixteen rays sees the road symmetrically and still
+learns a one-handed habit if every bend it trains on turns the same way.
+`both_ways` stays off by default only so that the numbers above stay
+comparable; `python run.py --set both_ways=true` raises two-handed drivers.
+(The same thing in the browser version, more extreme: there one-way drivers
+lapped nothing at all mirrored.)
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
