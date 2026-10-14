@@ -233,6 +233,10 @@ their laps are 5% slower (236 ticks against 224): a coarser picture of the
 road costs a little pace, not the ability to get round. It stays at 20; on
 a slow machine, 10 is a fair trade.
 
+**Who gets to breed.** The share of each species allowed to have children
+(`survival`, 0.4) makes no difference across 0.2 to 0.6: 13.53, 13.53 and
+13.38 held-out laps, hard set, 32 seeds. It stays.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
