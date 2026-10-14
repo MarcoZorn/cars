@@ -197,9 +197,9 @@ resembles.
 
 More pillars in training, then? Up to six on the hardest training tracks,
 the exam left at three (`--set track_obstacles=6 --exam track_obstacles=3`):
-13.47 held-out laps, against 13.53. No better. For the first time one seed
-in 32 lapped all fifteen held-out tracks, so track 14 is not beyond a
-generalist, but more pillars in general is not what teaches it.
+13.47 held-out laps, against 13.53. No better. (Now and then a seed does
+lap all fifteen, here and in earlier runs, so track 14 is not beyond a
+generalist; more pillars in general is just not what teaches it.)
 
 ## Files
 
