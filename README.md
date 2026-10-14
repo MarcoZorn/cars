@@ -31,6 +31,7 @@ pip install -r requirements.txt
 python run.py
 python run.py --hard   # sharper, narrower tracks, pillars on the hardest
 python run.py --load saves/gen0040.pkl.gz   # carry on from a save
+python run.py --set n_rays=8 sharing=square   # watch any experiment below, any Config field
 ```
 
 Controls:

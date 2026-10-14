@@ -2,7 +2,7 @@
 import argparse
 
 from app import App
-from config import Config
+from config import Config, overrides
 
 
 def main():
@@ -14,9 +14,11 @@ def main():
                    help="carry on from a save (press s in the app to make one)")
     p.add_argument("--hard", action="store_true",
                    help="the hard track set: sharper, narrower, pillars on the hardest")
+    p.add_argument("--set", nargs="*", default=[], metavar="FIELD=VALUE",
+                   help="any Config field, e.g. --set n_rays=8 sharing=none")
     a = p.parse_args()
     hard = dict(track_hardness=1.6, track_obstacles=3) if a.hard else {}
-    App(Config(pop_size=a.pop, generations=a.generations, ui_scale=a.scale, **hard), resume=a.load).run()
+    App(Config(pop_size=a.pop, generations=a.generations, ui_scale=a.scale, **hard, **overrides(a.set)), resume=a.load).run()
 
 
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ from multiprocessing import Pool
 import numpy as np
 
 from car import Car, N_OUTPUTS, fitness, n_inputs, step_all
-from config import Config
+from config import Config, overrides as parse
 from neat_core.brain import Brain
 from neat_core.population import Population
 from tracks import build_tracks
@@ -35,16 +35,6 @@ def race(genomes, track, cfg):
             break
         step_all(cars, track, cfg)
     return cars
-
-
-def parse(pairs):
-    out = {}
-    for kv in pairs:
-        k, v = kv.split("=")
-        kind = type(getattr(Config, k))
-        # bool("False") is True, so booleans are read by name
-        out[k] = v.lower() in ("1", "true", "yes") if kind is bool else kind(v)
-    return out
 
 
 def run(args):

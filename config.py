@@ -73,3 +73,15 @@ class Config:
     panel_w: int = 380
     stats_h: int = 190
     ui_scale: float = 0.0         # 0 = pick from desktop resolution
+
+
+def overrides(pairs):
+    """["n_rays=8", "sharing=none"] -> {"n_rays": 8, "sharing": "none"}, typed
+    like the Config field each one sets."""
+    out = {}
+    for kv in pairs:
+        k, v = kv.split("=")
+        kind = type(getattr(Config, k))
+        # bool("False") is True, so booleans are read by name
+        out[k] = v.lower() in ("1", "true", "yes") if kind is bool else kind(v)
+    return out
