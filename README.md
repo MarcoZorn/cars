@@ -216,12 +216,13 @@ seeds, hard set, on the fifteen held-out tracks each way:
 | every other track mirrored (`both_ways=True`) | 13.2 | 13.1 |
 
 A third of a lap given up the usual way round for four laps gained the other
-way. Even a ring of sixteen rays sees the road symmetrically and still
-learns a one-handed habit if every bend it trains on turns the same way.
+way. Even a ring of sixteen rays, which sees the road symmetrically, learns
+a one-handed habit when every lap it trains on goes round the same way.
 `both_ways` stays off by default only so that the numbers above stay
 comparable; `python run.py --set both_ways=true` raises two-handed drivers.
-(The same thing in the browser version, more extreme: there one-way drivers
-lapped nothing at all mirrored.)
+(The same thing in the browser version, more extreme: there the one-way
+record holder lapped nothing mirrored, and the best generalist 24 laps
+against 106.)
 
 ## Files
 
