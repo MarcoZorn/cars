@@ -13,7 +13,7 @@ from config import Config
 from neat_core.brain import Brain
 from neat_core.genes import HIDDEN, Genome, Innovations
 from neat_core.population import Population, Species
-from tracks import build_tracks
+from tracks import Track, build_tracks
 
 
 def genome(cfg, innov, n=40):
@@ -112,6 +112,17 @@ def test_difficulty_actually_makes_later_tracks_harder():
         "the hardest tracks should have more bends than the easiest"
     assert mean(width_variation, hard) > mean(width_variation, easy), \
         "the hardest tracks should vary in width more than the easiest"
+
+
+def test_a_mirrored_track_is_the_same_track_reflected():
+    """mirror=True reflects the track top to bottom, so it is driven the
+    other way round; every point on its centerline is the original's,
+    reflected, and the car sets off in the reflected direction."""
+    a, b = Track(321, difficulty=0.6), Track(321, difficulty=0.6, mirror=True)
+    pa, pb = np.asarray(a.center_pts), np.asarray(b.center_pts)
+    assert np.allclose(pa[:, 0], pb[:, 0]), "the same x everywhere"
+    assert np.allclose(pa[:, 1] - a.cy, -(pb[:, 1] - b.cy)), "y reflected about the centre"
+    assert abs(math.sin(a.start_heading) + math.sin(b.start_heading)) < 1e-6, "setting off reflected"
 
 
 def test_every_track_stays_wide_enough_for_the_car():
