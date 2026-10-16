@@ -376,6 +376,23 @@ def test_a_save_carries_on_exactly():
     assert a == b, "a reloaded population must evolve exactly as the original"
 
 
+
+def test_a_delayed_car_acts_on_old_outputs():
+    cfg = Config(delay=3)
+    track = build_tracks(cfg)[0]
+    pop = Population(n_inputs(cfg), N_OUTPUTS, cfg)
+    g = pop.genomes[0]
+    c = Car(g, Brain(g), track, cfg)
+    said = []
+    real = c.brain.step
+    c.brain.step = lambda s: said.append(list(real(s))) or said[-1]
+    acted = []
+    for _ in range(6):
+        step_all([c], track, cfg)
+        acted.append(c.out)
+    assert acted[:3] == [[0.0, 0.0]] * 3 and acted[3:] == said[:3]
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     for t in tests:

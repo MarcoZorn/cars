@@ -59,7 +59,7 @@ class Car:
     __slots__ = ("genome", "brain", "x", "y", "a", "v", "alive", "ticks",
                  "stall", "theta0", "theta_unwrapped", "last_theta",
                  "progress", "best_progress", "lives", "finished",
-                 "sensors", "out")
+                 "sensors", "out", "pending")
 
     def __init__(self, genome, brain, track, cfg):
         self.genome = genome
@@ -71,6 +71,7 @@ class Car:
         self.finished = False
         self.sensors = [0.0] * n_inputs(cfg)
         self.out = [0.0, 0.0]
+        self.pending = [[0.0, 0.0] for _ in range(cfg.delay)]   # outputs not yet acted on
         self.respawn(track)
 
     def respawn(self, track):
@@ -135,7 +136,11 @@ def step_all(cars, track, cfg):
     senses = sense_all(alive, track, cfg)
     for c, row in zip(alive, senses):
         c.sensors = row.tolist()
-        c.out = c.brain.step(c.sensors)
+        out = c.brain.step(c.sensors)
+        if cfg.delay:
+            c.pending.append(list(out))
+            out = c.pending.pop(0)
+        c.out = out
 
     n = len(alive)
     steer = np.fromiter((c.out[0] for c in alive), float, n)

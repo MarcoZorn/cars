@@ -40,6 +40,7 @@ class Config:
     ray_range: float = 220.0
     ray_steps: int = 20           # points sampled along each ray
     speed_input: bool = True      # the car feels its own speed (an experiment: does it need to?)
+    delay: int = 0                # the car acts on what its brain said this many ticks ago (an experiment)
 
     # car physics (arcade model, not a real bicycle model)
     accel: float = 220.0          # px/s^2 at full throttle
