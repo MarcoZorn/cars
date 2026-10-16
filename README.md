@@ -240,6 +240,21 @@ of each species copied unchanged: 13.28 with none, 13.53 with 2, 13.28
 with 5. Or the rate new neurons appear: 13.50 at twice the default
 (p_add_node 0.1).
 
+Slow reactions do matter. With `--set delay=3` every car acts on what its
+brain said three ticks (0.1 s) before; `delay=6` is 0.2 s. Eight seeds
+each, held-out laps out of 15 and lap time in ticks:
+
+| delay | held-out laps | lap ticks |
+|---|---|---|
+| none | 14.12 | 215 |
+| 0.1 s | 13.00 | 286 |
+| 0.2 s | 11.00 (6 to 14) | 651 |
+
+A tenth of a second costs a lap and a third of the speed; a fifth makes
+the laps three times as slow and some seeds never learn half the tracks.
+The drivers that cope do it by going slower, the one thing a late
+reaction leaves them.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
