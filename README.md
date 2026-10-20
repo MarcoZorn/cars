@@ -255,6 +255,24 @@ the laps three times as slow and some seeds never learn half the tracks.
 The drivers that cope do it by going slower, the one thing a late
 reaction leaves them.
 
+Raised in fog, they slow down. `--set ray_range=55` shortens every ray to
+a quarter of its 220. Eight seeds each:
+
+| sight | held-out laps | lap ticks |
+|---|---|---|
+| 440 | 13.88 | 216 |
+| 220 (default) | 14.12 | 215 |
+| 110 | 14.38 | 216 |
+| 55 | 14.25 | 305 |
+| 30 | 14.00 | 443 |
+
+Down to half the range nothing changes: these tracks never need more. Below
+that the drivers still lap every track as often, and simply drive as fast
+as they can see, half as fast at 30. In the city simulator, drivers
+evolved with full sight and then put in fog did the opposite and sped up,
+reading the edge of their shortened sight as open road; evolved in it,
+they learn what it means.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
