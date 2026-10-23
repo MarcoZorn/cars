@@ -273,6 +273,24 @@ evolved with full sight and then put in fog did the opposite and sped up,
 reading the edge of their shortened sight as open road; evolved in it,
 they learn what it means.
 
+Nor does the size of the population. 100, 200 or 400 cars, eight seeds,
+sixty generations: 14.00, 14.12 and 14.25 held-out laps of 15. That exam
+is nearly full, though, so a harder one: twenty generations only, held-out
+tracks a half harder with three pillars each (`--gens 20 --exam
+track_hardness=1.5 track_obstacles=3`):
+
+| cars | held-out laps of 15, per seed | mean |
+|---|---|---|
+| 100 | 14 11 9 8 10 13 9 11 | 10.62 |
+| 200 | 10 11 8 9 8 11 8 10 | 9.38 |
+| 400 | 13 9 8 10 8 10 9 9 | 9.50 |
+
+Still nothing: every run laps all thirty training tracks inside twenty
+generations, whatever the size, and the spread between seeds is wider than
+between sizes. The harder exam does leave room, 8 to 14 laps instead of
+13 to 15, so it is the one to use from here when two settings look the same
+on the usual one.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
