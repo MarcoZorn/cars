@@ -285,7 +285,7 @@ track_hardness=1.5 track_obstacles=3`):
 | 200 | 10 11 8 9 8 11 8 10 | 9.38 |
 | 400 | 13 9 8 10 8 10 9 9 | 9.50 |
 
-Still nothing: every run laps all thirty training tracks inside twenty
+Still nothing: every run but one laps all thirty training tracks inside twenty
 generations, whatever the size, and the spread between seeds is wider than
 between sizes. The harder exam does leave room, 8 to 14 laps instead of
 13 to 15, so it is the one to use from here when two settings look the same
