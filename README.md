@@ -294,7 +294,7 @@ on the usual one.
 The ray count, on that harder exam (twenty generations, eight seeds):
 8 rays 9.25 laps of 15, 16 rays 9.38, 24 rays 9.88, inside the spread
 between seeds again. Only the lap time moves, 228, 214 and 210 ticks:
-fewer rays, a little slower, as on the usual exam.
+fewer rays, a little slower.
 
 ## Files
 
