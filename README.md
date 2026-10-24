@@ -313,8 +313,7 @@ also learn as fast: 29.38 of 30 training laps in twenty generations, on
 tracks that are harder to lap.
 
 Sixteen seeds, with the hard set kept passable everywhere (`track_room`:
-the hard set used to be allowed pinches too tight for a car, which is
-also what capped it): trained on the usual tracks, 14.06 on the usual
+the hard set used to be allowed pinches too tight for a car): trained on the usual tracks, 14.06 on the usual
 exam and 10.25 on the harder one; trained on the harder tracks, 14.12 and
 13.56. So the harder set, three pillars and room everywhere, is now the
 default (`track_hardness=1.5 track_obstacles=3 track_room=1`), and the
