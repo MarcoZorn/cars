@@ -291,6 +291,11 @@ between sizes. The harder exam does leave room, 8 to 14 laps instead of
 13 to 15, so it is the one to use from here when two settings look the same
 on the usual one.
 
+The ray count, on that harder exam (twenty generations, eight seeds):
+8 rays 9.25 laps of 15, 16 rays 9.38, 24 rays 9.88, inside the spread
+between seeds again. Only the lap time moves, 228, 214 and 210 ticks:
+fewer rays, a little slower, as on the usual exam.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
