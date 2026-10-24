@@ -65,9 +65,9 @@ class Config:
     # tracks
     n_tracks: int = 30           # was 15; 30 measured a little better on the same held-out exam, see README
     track_seed: int = 100         # tracks are fixed, independent of run seed
-    track_hardness: float = 1.0   # difficulty of the last track; >1 is a harder set
-    track_obstacles: int = 0      # pillars on the last track, fewer on earlier ones
-    track_room: bool = False      # keep three car widths of room on harder sets too (no impassable pinches)
+    track_hardness: float = 1.5   # difficulty of the last track; was 1.0, harder trains better drivers, see README
+    track_obstacles: int = 3      # pillars on the last track, fewer on earlier ones; was 0, same reason
+    track_room: bool = True       # keep three car widths of room on harder sets too (no impassable pinches)
     both_ways: bool = False       # every other track mirrored, driven the other way round
 
     # view

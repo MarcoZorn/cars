@@ -334,8 +334,8 @@ def test_wall_lookup_matches_the_analytic_walls():
 
 def test_pillars_block_one_side_and_leave_the_other_open():
     """A pillar is solid, the start line stays clear, and at every pillar
-    there is still a lane past it wide enough for the car."""
-    cfg = Config(track_obstacles=6)
+    there is still a lane past it wide enough for the car (the standard set)."""
+    cfg = Config(track_obstacles=6, track_hardness=1.0)
     tracks = build_tracks(cfg)
     assert not tracks[0].pillars and len(tracks[-1].pillars) == 6
     for t in tracks:
@@ -351,6 +351,16 @@ def test_pillars_block_one_side_and_leave_the_other_open():
                 f"{t.name}: no lane left past a pillar"
             assert hw * 0.85 * min(t.sx, t.sy) > cfg.car_w * 2
 
+
+
+def test_the_default_hard_set_leaves_a_lane_past_every_pillar():
+    """The default tracks are harder and narrower, but past every pillar the
+    open side is still one and a half car widths at least."""
+    cfg = Config()
+    for t in build_tracks(cfg):
+        for px, py, rad in t.pillars:
+            theta, _ = t.from_world(px, py)
+            assert t.half_width(theta) * 0.85 * min(t.sx, t.sy) > cfg.car_w * 1.5, f"{t.name}: lane too narrow"
 
 def test_a_save_carries_on_exactly():
     import os
