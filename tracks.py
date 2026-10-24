@@ -193,7 +193,7 @@ def build_tracks(cfg):
                   difficulty=cfg.track_hardness * i / max(1, n - 1),
                   obstacles=round(cfg.track_obstacles * i / max(1, n - 1)),
                   # the standard set keeps three car widths of room everywhere;
-                  # the hard set is allowed its pinches
-                  min_half_width=cfg.car_w * 3 if cfg.track_hardness <= 1 else 0.0,
+                  # the hard set is allowed its pinches, unless track_room asks for it too
+                  min_half_width=cfg.car_w * 3 if cfg.track_hardness <= 1 or cfg.track_room else 0.0,
                   mirror=cfg.both_ways and i % 2 == 1)
             for i in range(n)]
