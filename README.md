@@ -296,6 +296,22 @@ The ray count, on that harder exam (twenty generations, eight seeds):
 between seeds again. Only the lap time moves, 228, 214 and 210 ticks:
 fewer rays, a little slower.
 
+What does lift the harder exam is training for it. Twenty generations,
+eight seeds, training tracks either the usual ones or a half harder with
+three pillars each (`--set track_hardness=1.5 track_obstacles=3`), then
+both exams (note `--exam` has to name the usual exam's values to get it
+back, since the exam otherwise inherits the training settings):
+
+| trained on | usual exam | harder exam | lap ticks, usual |
+|---|---|---|---|
+| usual tracks | 13.75 | 9.38 | 218 |
+| harder tracks | 14.12 | 13.75 | 222 |
+
+Drivers raised on the hard tracks lose nothing on the easy ones and are
+far better on hard ones they never saw, at a cost of 2% in lap time. They
+also learn as fast: 29.38 of 30 training laps in twenty generations, on
+tracks that are harder to lap.
+
 ## Files
 
 - `neat_core/` - genome, mutation, crossover, speciation (standard NEAT)
