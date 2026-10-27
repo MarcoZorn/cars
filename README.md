@@ -143,6 +143,24 @@ times the compute per generation, and 16 is now the default. Past 16 it
 stops paying. (The eight-ray results above still stand as comparisons among
 themselves.)
 
+**Eyes that evolve.** In neat-from-scratch, letting each genome carry its
+own ray angles and range took a third off the time to learn hard tracks.
+Here (`--set evolve_eyes=1`) each of the 16 rays may turn away from its
+place in the ring and the range may grow or shrink (from 220, within 40 to
+600), inherited from the fitter parent and mutated with the weights.
+Default exam, sixteen seeds:
+
+| eyes | held-out laps / 15 | lap fraction | lap ticks | seeds better / worse / tied |
+|---|---|---|---|---|
+| fixed ring | 13.31 | 0.966 | 218 | - |
+| evolving | 13.75 | 0.978 | 220 | 8 / 4 / 4 |
+
+A little better, half a lap in fifteen and laps 1% slower, in a city of
+sixteen rays that already sees all the way round. There is less to gain by
+moving eyes when every direction is already covered; the five-ray cone in
+neat-from-scratch had blind sides to fix. Kept as an option, not the
+default.
+
 **How many training tracks?** Each generation races one track, cycling
 through the set, so more tracks costs nothing extra. Hard set, 16 rays, 32
 seeds, as a share of tracks lapped (the held-out set is the same size as the
