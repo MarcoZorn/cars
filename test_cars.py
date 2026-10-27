@@ -409,3 +409,32 @@ if __name__ == "__main__":
         t()
         print(f"  ok  {t.__name__}")
     print(f"\n{len(tests)} passed")
+
+
+def test_evolving_eyes_are_copied_mutated_and_seen():
+    """With evolve_eyes each genome owns its ray turns and range: a copy or a
+    crossover child must not share them with its parent, mutation must move
+    them within bounds, and the ray march must look where they say."""
+    from neat_core.population import Population
+    cfg = Config(evolve_eyes=True, pop_size=30)
+    random.seed(5)
+    pop = Population(n_inputs(cfg), N_OUTPUTS, cfg)
+    g = pop.genomes[0]
+    assert g.eyes is not None and len(g.eyes[0]) == cfg.n_rays
+    c = g.copy()
+    c.eyes[0][0] += 1.0
+    assert g.eyes[0][0] != c.eyes[0][0], "a copy must not share its parent's eyes"
+    for _ in range(200):
+        g.mutate(pop.innov, cfg)
+    assert any(t != 0 for t in g.eyes[0]) and cfg.eye_min <= g.eyes[1] <= cfg.eye_max
+    # zero turns and the stock range see exactly what the fixed fan sees
+    track = build_tracks(cfg)[0]
+    plain = Config()
+    a = Car(genome(plain, Innovations()), None, track, plain)
+    b = Car(pop.genomes[1], None, track, cfg)
+    b.genome.eyes = ([0.0] * cfg.n_rays, cfg.ray_range)
+    assert np.allclose(sense_all([a], track, plain), sense_all([b], track, cfg))
+    # and a car that looks only straight back sees the same on every ray
+    b.genome.eyes = ([math.pi - x for x in ray_angles(cfg)], cfg.ray_range)
+    row = sense_all([b], track, cfg)[0][:cfg.n_rays]
+    assert np.allclose(row, row[0])
