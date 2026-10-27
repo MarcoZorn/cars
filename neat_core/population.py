@@ -40,6 +40,8 @@ class Population:
         self.best = None
         self.history = []
         proto = Genome.minimal(n_in, n_out, self.innov, cfg)
+        if cfg.evolve_eyes:
+            proto.eyes = ([0.0] * cfg.n_rays, cfg.ray_range)
         self.genomes = [proto.copy().mutate(self.innov, cfg) for _ in range(cfg.pop_size)]
         self.speciate()
 

@@ -102,13 +102,17 @@ def sense_all(cars, track, cfg):
     steps = cfg.ray_steps
     t = np.linspace(0.0, 1.0, steps)[None, None, :]                 # 1,1,S
     ray_off = np.array(ray_angles(cfg))[None, :, None]              # 1,R,1
+    reach = np.full((n, 1, 1), cfg.ray_range)                        # N,1,1
+    if cfg.evolve_eyes:   # each car's own turns and range
+        ray_off = ray_off + np.array([c.genome.eyes[0] for c in cars])[:, :, None]
+        reach = np.fromiter((c.genome.eyes[1] for c in cars), float, n)[:, None, None]
 
     xs = np.fromiter((c.x for c in cars), float, n)[:, None, None]
     ys = np.fromiter((c.y for c in cars), float, n)[:, None, None]
     heads = np.fromiter((c.a for c in cars), float, n)[:, None, None]
 
     ang = heads + ray_off                                            # N,R,1
-    dist = t * cfg.ray_range                                         # 1,1,S
+    dist = t * reach                                                 # N,1,S
     px = xs + np.cos(ang) * dist                                     # N,R,S
     py = ys + np.sin(ang) * dist
 

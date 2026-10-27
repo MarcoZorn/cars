@@ -39,6 +39,12 @@ class Config:
     fov: float = 2 * math.pi      # a full circle of coverage
     ray_range: float = 220.0
     ray_steps: int = 20           # points sampled along each ray
+    evolve_eyes: bool = False     # each genome's ray angles and range are genes too (an experiment)
+    p_eye: float = 0.2            # per mutation: chance each ray turns, and the range zooms
+    eye_turn: float = 0.15        # radians, std of a turn
+    eye_zoom: float = 0.1         # log std of a range change
+    eye_min: float = 40.0
+    eye_max: float = 600.0
     speed_input: bool = True      # the car feels its own speed (an experiment: does it need to?)
     delay: int = 0                # the car acts on what its brain said this many ticks ago (an experiment)
 

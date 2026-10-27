@@ -8,6 +8,7 @@ of generations, so the genome only needs to be exactly as flexible as that.
 Reference: Stanley & Miikkulainen (2002), "Evolving Neural Networks through
 Augmenting Topologies".
 """
+import math
 import random
 from dataclasses import dataclass, replace
 
@@ -59,6 +60,9 @@ class Genome:
         self.fitness = 0.0
         self.adjusted = 0.0
         self.species = 0
+        # optional evolving sensors (cfg.evolve_eyes): each ray's turn away from
+        # the stock fan, and the sight range
+        self.eyes = None
 
     @classmethod
     def minimal(cls, n_in, n_out, innov, cfg):
@@ -78,7 +82,10 @@ class Genome:
         return g
 
     def copy(self):
-        return Genome(dict(self.nodes), {i: replace(c) for i, c in self.conns.items()})
+        g = Genome(dict(self.nodes), {i: replace(c) for i, c in self.conns.items()})
+        if self.eyes is not None:
+            g.eyes = (list(self.eyes[0]), self.eyes[1])
+        return g
 
     def add_conn(self, src, dst, w, innov):
         i = innov.conn(src, dst)
@@ -113,7 +120,16 @@ class Genome:
             self.mutate_add_node(innov)
         if random.random() < cfg.p_toggle:
             self.mutate_toggle()
+        if self.eyes is not None:
+            self.mutate_eyes(cfg)
         return self
+
+    def mutate_eyes(self, cfg):
+        turns, rng = self.eyes
+        turns = [t + random.gauss(0, cfg.eye_turn) if random.random() < cfg.p_eye else t for t in turns]
+        if random.random() < cfg.p_eye:
+            rng = min(cfg.eye_max, max(cfg.eye_min, rng * math.exp(random.gauss(0, cfg.eye_zoom))))
+        self.eyes = (turns, rng)
 
     def mutate_weights(self, cfg):
         for c in self.conns.values():
@@ -165,6 +181,8 @@ class Genome:
             if cb is not None and not (ca.enabled and cb.enabled):
                 c.enabled = random.random() > cfg.p_inherit_disabled
             child.conns[i] = c
+        if a.eyes is not None:   # eyes from the fitter parent, like its excess genes
+            child.eyes = (list(a.eyes[0]), a.eyes[1])
         for c in child.conns.values():
             child.nodes.setdefault(c.src, HIDDEN)
             child.nodes.setdefault(c.dst, HIDDEN)
