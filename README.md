@@ -155,10 +155,10 @@ Default exam, sixteen seeds:
 | fixed ring | 13.31 | 0.966 | 218 | - |
 | evolving | 13.75 | 0.978 | 220 | 8 / 4 / 4 |
 
-A little better, half a lap in fifteen and laps 1% slower, in a city of
-sixteen rays that already sees all the way round. There is less to gain by
-moving eyes when every direction is already covered; the five-ray cone in
-neat-from-scratch had blind sides to fix. Kept as an option, not the
+A little better, half a lap in fifteen and laps 1% slower, for a car whose
+sixteen rays already see all the way round. Presumably there is less to
+gain by moving eyes when every direction is already covered; the five-ray
+fan in neat-from-scratch is blind behind (a guess, not tested). Kept as an option, not the
 default.
 
 **How many training tracks?** Each generation races one track, cycling
