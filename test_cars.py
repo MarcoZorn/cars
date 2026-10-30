@@ -449,6 +449,29 @@ def test_report_reads_a_bench_log():
         f.write("n_rays=8  exam: track_obstacles=3  pop=200 gens=20 seeds=1  (9s)\n  held-out laps/15 per seed: 9\n")
     assert parse(p)["set"] == "n_rays=8  exam: track_obstacles=3"
 
+def test_report_charts_a_swept_setting():
+    import os
+    import tempfile
+    from report import chart, page, parse, sweeps
+    d = tempfile.mkdtemp()
+    runs = []
+    for i, (rays, laps) in enumerate([(4, "8 9 7"), (8, "11 12 10"), (16, "13 14 12")]):
+        p = os.path.join(d, f"r{rays}.log")
+        with open(p, "w") as f:
+            f.write(f"n_rays={rays}  pop=200 gens=20 seeds=3  (9s)\n  held-out laps/15 per seed: {laps}\n")
+        os.utime(p, (1000 + i, 1000 + i))
+        runs.append(parse(p))
+    lone = os.path.join(d, "x.log")
+    with open(lone, "w") as f:
+        f.write("delay=2  pop=200 gens=20 seeds=3  (9s)\n  held-out laps/15 per seed: 5 5 5\n")
+    runs.append(parse(lone))
+    sw = sweeps(runs)
+    assert list(sw) == ["n_rays"] and [r["set"] for r in sw["n_rays"]] == ["n_rays=4", "n_rays=8", "n_rays=16"], "one sweep, in order of value; delay=2 alone is not one"
+    svg = chart("n_rays", sw["n_rays"])
+    assert svg.count("<circle") == 3 and svg.count("stroke-width=\"3\"") == 3, "a point and an interval per value"
+    assert "<h2>n_rays</h2>" in page(runs) and "<h2>delay</h2>" not in page(runs)
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     for t in tests:
