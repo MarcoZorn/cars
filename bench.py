@@ -101,7 +101,7 @@ def main():
     jobs = [(a.seed0 + s, a.pop, a.gens, overrides, a.holdout, exam) for s in range(a.seeds)]
     with Pool(min(len(jobs), 30)) as pool:
         res = pool.map(run, jobs)
-    print(f"{' '.join(a.set) or 'baseline'}  pop={a.pop} gens={a.gens} seeds={a.seeds}"
+    print(f"{' '.join(a.set) or 'baseline'}{'  exam: ' + ' '.join(a.exam) if a.exam else ''}  pop={a.pop} gens={a.gens} seeds={a.seeds}"
           f"  ({time.time() - t0:.0f}s)")
     for name, k in (("train", 0), ("held-out", 1)):
         laps = [r[k][0] for r in res]

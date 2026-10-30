@@ -425,6 +425,30 @@ def test_bootstrap_interval_brackets_the_mean():
     assert lo < 11.5 < hi and 9 <= lo and hi <= 14
     assert bootstrap([7, 7, 7]) == (7.0, 7.0)
 
+
+def test_report_reads_a_bench_log():
+    import os
+    import tempfile
+    from report import page, parse
+    d = tempfile.mkdtemp()
+    p = os.path.join(d, "x.log")
+    with open(p, "w") as f:
+        f.write("n_rays=8  pop=200 gens=20 seeds=3  (99s)\n"
+                "  train    laps/30 per seed: 30 29 30\n"
+                "  train    laps mean 29.67  lap-frac mean 0.99  lap ticks mean 220\n"
+                "  held-out laps/15 per seed: 14 12 13\n"
+                "  held-out laps mean 13.00  lap-frac mean 0.96  lap ticks mean 215\n")
+    r = parse(p)
+    assert r["set"] == "n_rays=8" and r["seeds"] == 3 and r["held-out"]["laps"] == [14, 12, 13]
+    assert r["mean"] == 13.0 and r["lo"] <= 13.0 <= r["hi"] and r["held-out"]["ticks"] == 215
+    assert "n_rays=8" in page([r])
+    with open(os.path.join(d, "junk.log"), "w") as f:
+        f.write("not a bench run\n")
+    assert parse(os.path.join(d, "junk.log")) is None
+    with open(p, "w") as f:
+        f.write("n_rays=8  exam: track_obstacles=3  pop=200 gens=20 seeds=1  (9s)\n  held-out laps/15 per seed: 9\n")
+    assert parse(p)["set"] == "n_rays=8  exam: track_obstacles=3"
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     for t in tests:
