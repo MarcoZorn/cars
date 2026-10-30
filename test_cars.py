@@ -86,6 +86,21 @@ def test_tracks_do_not_pinch_shut():
             f"{t.name}: inner boundary comes close to crossing itself"
 
 
+def test_track_room_keeps_pinches_passable_at_hardness_two():
+    """With track_room the hard set keeps three car widths of half-width
+    everywhere; without it the same set does pinch, so the test can fail."""
+    theta = np.linspace(-np.pi, np.pi, 2000)
+
+    def narrowest(room):
+        cfg = Config()
+        cfg.track_hardness, cfg.track_room = 2.0, room
+        return min(float(t.half_width(theta).min()) for t in build_tracks(cfg)), cfg.car_w * 3
+
+    got, need = narrowest(True)
+    assert got > need, f"track_room: narrowest half-width {got:.2f} is under {need:.2f}"
+    assert narrowest(False)[0] < need, "without track_room the hard set should pinch"
+
+
 def test_difficulty_actually_makes_later_tracks_harder():
     """The curriculum only means anything if the geometry really changes -
     otherwise the last track is just the first with a different name.
