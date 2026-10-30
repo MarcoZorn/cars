@@ -28,6 +28,14 @@ from tracks import build_tracks
 HOLDOUT = 1000  # held-out tracks: same difficulty curve, different seeds
 
 
+def bootstrap(xs, reps=4000, seed=12345):
+    """95% interval of the mean over seeds, by resampling the seeds."""
+    rng = np.random.default_rng(seed)
+    xs = np.asarray(xs, float)
+    means = rng.choice(xs, size=(reps, len(xs))).mean(axis=1)
+    return float(np.quantile(means, 0.025)), float(np.quantile(means, 0.975))
+
+
 def race(genomes, track, cfg):
     cars = [Car(g, Brain(g), track, cfg) for g in genomes]
     for _ in range(cfg.max_ticks):
@@ -100,7 +108,8 @@ def main():
         total = Config(**overrides).n_tracks if k == 0 or not a.holdout else a.holdout
         print(f"  {name:8} laps/{total} per seed:",
               " ".join(f"{x:.0f}" for x in laps))
-        print(f"  {name:8} laps mean {np.mean(laps):.2f}"
+        lo, hi = bootstrap(laps)
+        print(f"  {name:8} laps mean {np.mean(laps):.2f} (95% interval {lo:.2f}-{hi:.2f})"
               f"  lap-frac mean {np.mean([r[k][1] for r in res]):.3f}"
               f"  lap ticks mean {np.mean([r[k][2] for r in res]):.0f}")
 

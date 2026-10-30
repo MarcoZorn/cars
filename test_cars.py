@@ -403,6 +403,13 @@ def test_a_delayed_car_acts_on_old_outputs():
     assert acted[:3] == [[0.0, 0.0]] * 3 and acted[3:] == said[:3]
 
 
+
+def test_bootstrap_interval_brackets_the_mean():
+    from bench import bootstrap
+    lo, hi = bootstrap([9, 10, 11, 12, 13, 14])
+    assert lo < 11.5 < hi and 9 <= lo and hi <= 14
+    assert bootstrap([7, 7, 7]) == (7.0, 7.0)
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     for t in tests:
